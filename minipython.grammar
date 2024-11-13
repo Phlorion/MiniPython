@@ -61,7 +61,7 @@ Productions
 				{array_assign}tab* id l_bra expression r_bra eq expression |
 				{assert}tab* assert expression comma_expression? |
 				{func_call}tab* function_call |
-				{import}tab* import;
+				{import}tab* import_call;
 				
 	comma_expression = comma expression;
 
