@@ -55,7 +55,7 @@ Productions
 	statement ={if}tab* if  comparison semi statement |
 				{while}tab* while comparison semi expression |
 				{for}tab* for id in id semi statement |
-				{return}return expression |
+				{return}tab* return expression |
 				{print}tab* print expression comma_expression*|
 				{assignop}tab* id assignop expression |
 				{array_assign}tab* id l_bra expression r_bra eq expression |
