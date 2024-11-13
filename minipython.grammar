@@ -20,6 +20,8 @@ Tokens
 	eq = '=';
 	l_par = '(';
 	r_par = ')';
+	l_bra = '[';
+	r_bra = ']';
 	comma=',';
 	if = 'if';
 	print = 'print';
@@ -30,6 +32,11 @@ Tokens
 	false = 'false';
 	else = 'else';
 	def = 'def';
+	in = 'in';
+	return = 'return';
+	while = 'while';
+	for = 'for';
+	assert = 'assert';
 	quote = '"';
 	blank = (' ' | lf | cr);
 	line_comment = '#' not_eol* eol; 
@@ -46,8 +53,17 @@ Productions
 				 {expr}expression;
 	
 	statement ={if}tab* if  comparison semi statement |
-				  {assign}tab* id assignop expression |
-				  {print}tab* print expression;
+				{while}tab* while comparison semi expression |
+				{for}tab* for id in id semi statement |
+				{return}return expression |
+				{print}tab* print expression comma_expression*|
+				{assignop}tab* id assignop expression |
+				{array_assign}tab* id l_bra expression r_bra eq expression |
+				{assert}tab* assert expression comma_expression? |
+				{func_call}tab* function_call |
+				{import}tab* import;
+				
+	comma_expression = comma expression;
 
 	assignop = {eq} eq |
 				{mineq} mineq |
