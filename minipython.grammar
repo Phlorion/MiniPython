@@ -1,0 +1,81 @@
+Package minipython;
+
+Helpers
+	digit = ['0' .. '9'];
+	letter = ['a' .. 'z']|['A' .. 'Z']; 
+	cr = 13; 
+	lf = 10;
+	all = [0..127]; 
+	eol = lf | cr | cr lf ;
+	not_eol = [all - [cr + lf]]; 
+
+Tokens
+	tab = 9;
+	plus = '+';
+	mineq = '-=';
+	minus = '-';
+	mult = '*';
+	diveq = '/=';
+	div = '/';
+	eq = '=';
+	l_par = '(';
+	r_par = ')';
+	comma=',';
+	if = 'if';
+	print = 'print';
+	less = '<';
+	great = '>';
+	true = 'true';
+	semi = ':';
+	false = 'false';
+	else = 'else';
+	def = 'def';
+	quote = '"';
+	blank = (' ' | lf | cr);
+	line_comment = '#' not_eol* eol; 
+	number = digit+;
+	id = letter (letter | digit)*;
+
+Ignored Tokens
+	blank, line_comment;
+	
+Productions
+	programme = commands*;
+	
+	commands ={stat} statement|
+				 {expr}expression;
+	
+	statement ={if}tab* if  comparison semi statement |
+				  {assign}tab* id assignop expression |
+				  {print}tab* print expression;
+
+	assignop = {eq} eq |
+				{mineq} mineq |
+				{diveq} diveq;
+	
+	function = def id l_par arguements? r_par semi statement;
+
+	arguements = id assignval? multipleargs*;
+
+	multipleargs = comma id assignval?;
+
+	assignval = eq value;
+
+	value = 
+
+	comparison = {true} true|
+					 {false} false|
+					 {lessc} [lpar]:expression less [rpar]:expression|
+					 {greatc}[lpar]:expression great [rpar]:expression;
+					 
+	expression = {multiplication} multiplication |
+					{addition} expression plus multiplication|
+					{subtraction} expression minus multiplication;
+					
+	multiplication = {something} something |
+						  {multiplication} multiplication mult something;
+						  
+	something ={identifier}id|
+				  {numb}number|
+				  {par} l_par expression r_par;
+
