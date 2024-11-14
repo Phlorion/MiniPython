@@ -14,9 +14,11 @@ Tokens
 	plus = '+';
 	mineq = '-=';
 	minus = '-';
+	pow = '**';
 	mult = '*';
 	diveq = '/=';
 	div = '/';
+	mod = '%';
 	equal_equal = '==';
 	not_equal = '!=';
 	eq = '=';
@@ -24,7 +26,7 @@ Tokens
 	r_par = ')';
 	l_bra = '[';
 	r_bra = ']';
-	comma=',';
+	comma= ',';
 	not = 'not';
 	and = 'and';
 	or = 'or';
@@ -39,6 +41,10 @@ Tokens
 	false = 'false';
 	else = 'else';
 	def = 'def';
+	len = 'len';
+	ascii = 'ascii';
+	max = 'max';
+	min = 'min';
 	in = 'in';
 	return = 'return';
 	while = 'while';
@@ -92,27 +98,27 @@ Productions
 
 	assignval = eq value;
 
-	value = 
-
 	comparison = {true} true|
 					 {false} false|
 					 {lessc} [lpar]:expression less [rpar]:expression|
 					 {greatc}[lpar]:expression great [rpar]:expression;
 					 
-	expression = {multiplication} multiplication |
-					{addition} expression plus multiplication|
-					{subtraction} expression minus multiplication;
-					
-	multiplication = {something} something |
-						  {multiplication} multiplication mult something;
-						  
-	something ={identifier}id|
-				  {numb}number|
-				  {par} l_par expression r_par;
+					 
+	// Expressions (THELEI AKOMA DOYLEIA)				 
+	expression = {list_element} id l_bra expression r_bra |
+					{funtion_call} function_call |
+					{value} value |
+					{id} id |
+					{length} len l_par expression r_par |
+					{ascii_val} ascii l_par expression r_par |
+					{min_max} min_max l_par value multiple_values* r_par |
+					{parenthesis_expression} l_par expression r_par |
+					{list} l_bra value multiple_values* r_bra;
 
-
-
-
+	min_max = {min} min |
+				{max} max;
+				
+	multiple_values = comma value;
 
 
 	import_call = {import} import module as_ident? cmod_as_ident*|
