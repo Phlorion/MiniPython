@@ -17,14 +17,21 @@ Tokens
 	mult = '*';
 	diveq = '/=';
 	div = '/';
+	equal_equal = '==';
+	not_equal = '!=';
 	eq = '=';
 	l_par = '(';
 	r_par = ')';
 	l_bra = '[';
 	r_bra = ']';
 	comma=',';
+	not = 'not';
+	and = 'and';
+	or = 'or';
 	if = 'if';
 	print = 'print';
+	less_equal = '<=';
+	great_equal = '>=';
 	less = '<';
 	great = '>';
 	true = 'true';
@@ -37,11 +44,19 @@ Tokens
 	while = 'while';
 	for = 'for';
 	assert = 'assert';
+	as = 'as';
+	import = 'import';
+	from = 'from';
+	none = 'None';
+	dot = '.';
 	quote = '"';
 	blank = (' ' | lf | cr);
 	line_comment = '#' not_eol* eol; 
 	number = digit+;
 	id = letter (letter | digit)*;
+	// Den kserw an einai swsta etsi
+	string_single_quote = '\'not_eol*\'' ;
+	string_double_quote = '"not_eol*"';
 
 Ignored Tokens
 	blank, line_comment;
@@ -95,3 +110,48 @@ Productions
 				  {numb}number|
 				  {par} l_par expression r_par;
 
+
+
+
+
+
+	import_call = {import} import module as_ident? cmod_as_ident*|
+					{from_import} from module import id as_ident? cident_as_ident*;
+
+	cmod_as_ident = comma module as_ident?;
+
+	cident_as_ident = comma id as_ident?;
+
+	as_ident = as id;
+
+	module = ident_dot* id;
+
+	ident_dot = id dot;
+
+	comparison_or = {comp_and} comparison_and|
+					{or} comparison_or or comparison_and;
+
+	comparison_and = {comp_not} comparison_not|
+						{and} comparison_and and comparison_not;
+
+	comparison_not = {comparison} comparison|
+						not comparison;
+	
+	comparison = {great} [lexpr]:expression great [rexpr]: expression|
+					{less} [lexpr]:expression less [rexpr]: expression|
+					{great_eq} [lexpr]:expression great_equal [rexpr]: expression|
+					{less_eq} [lexpr]:expression less_equal [rexpr]: expression|
+					{not_eq} [lexpr]:expression not_equal [rexpr]: expression|
+					{comp_eq} [lexpr]:expression equal_equal [rexpr]: expression|
+					{true} true|
+					{false} false;
+
+	function_call = id l_par arglist? r_par;
+
+	arglist = expression comma_expression*;
+
+	value = {func_call} id dot function_call|
+				{number} number|
+				{double_quote_string} string_double_quote|
+				{single_quote_string} string_single_quote|
+				{none} none;
