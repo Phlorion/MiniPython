@@ -123,8 +123,7 @@ Productions
 	power = {power} factor pow power |
 				{factor} factor;
 				
-	factor = {number} number |
-				{expression} expression;
+	factor = expression;
 
 	min_max = {min} min |
 				{max} max;
