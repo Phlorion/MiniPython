@@ -61,7 +61,7 @@ Tokens
 	number = digit+;
 	id = letter (letter | digit)*;
 	// Den kserw an einai swsta etsi
-	string_single_quote = '\'not_eol*\'' ;
+	string_single_quote = '\'not_eol*'\' ;
 	string_double_quote = '"not_eol*"';
 
 Ignored Tokens
@@ -75,11 +75,11 @@ Productions
 	
 	statement ={if}tab* if  comparison semi statement |
 				{while}tab* while comparison semi expression |
-				{for}tab* for id in id semi statement |
+				{for}tab* for [element]:id in [collection]:id semi statement |
 				{return}tab* return expression |
 				{print}tab* print expression comma_expression*|
 				{assignop}tab* id assignop expression |
-				{array_assign}tab* id l_bra expression r_bra eq expression |
+				{array_assign}tab* id l_bra [index]:expression r_bra eq [right_side]:expression |
 				{assert}tab* assert expression comma_expression? |
 				{func_call}tab* function_call |
 				{import}tab* import_call;
@@ -97,15 +97,11 @@ Productions
 	multipleargs = comma id assignval?;
 
 	assignval = eq value;
-
-	comparison = {true} true|
-					 {false} false|
-					 {lessc} [lpar]:expression less [rpar]:expression|
-					 {greatc}[lpar]:expression great [rpar]:expression;
 					 
 					 
 	// Expressions (THELEI AKOMA DOYLEIA)				 
-	expression = {list_element} id l_bra expression r_bra |
+	expression = {addition} addition |
+					{list_element} id l_bra expression r_bra |
 					{funtion_call} function_call |
 					{value} value |
 					{id} id |
@@ -114,11 +110,27 @@ Productions
 					{min_max} min_max l_par value multiple_values* r_par |
 					{parenthesis_expression} l_par expression r_par |
 					{list} l_bra value multiple_values* r_bra;
+					
+	addition = {multiplication} multiplication |
+				{addition} addition plus multiplication |
+				{subtraction} addition minus multiplication;
+				
+	multiplication = {multiplication} multiplication mult power |
+						{division} multiplication div power |
+						{modulo} multiplication mod power |
+						{power} power;
+						
+	power = {power} factor pow power |
+				{factor} factor;
+				
+	factor = {number} number |
+				{expression} expression;
 
 	min_max = {min} min |
 				{max} max;
 				
 	multiple_values = comma value;
+	// End-Expressions
 
 
 	import_call = {import} import module as_ident? cmod_as_ident*|
