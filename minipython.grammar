@@ -152,7 +152,7 @@ Productions
 						{and} comparison_and and comparison_not;
 
 	comparison_not = {comparison} comparison|
-						not comparison;
+						{not} not comparison;
 	
 	comparison = {great} [lexpr]:expression great [rexpr]: expression|
 					{less} [lexpr]:expression less [rexpr]: expression|
