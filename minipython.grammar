@@ -8,6 +8,8 @@ Helpers
 	all = [0..127]; 
 	eol = lf | cr | cr lf ;
 	not_eol = [all - [cr + lf]]; 
+	quote = '"';
+	single_quote = ''';
 
 Tokens
 	tab = 9;
@@ -54,27 +56,26 @@ Tokens
 	import = 'import';
 	from = 'from';
 	none = 'None';
-	dot = '.';
+	dot = '.';										// Na doume an mpainei katw apo number
 	quote = '"';
 	blank = (' ' | lf | cr);
 	line_comment = '#' not_eol* eol; 
-	number = digit+;
+	number = digit+ | digit+ '.' digit+;  			// Erwthsh an thelei float
 	id = letter (letter | digit)*;
-	// Den kserw an einai swsta etsi
-	string_single_quote = '\'not_eol*'\' ;
-	string_double_quote = '"not_eol*"';
+	string_literal = quote [not_eol - quote]* quote | 
+					single_quote [not_eol - single_quote]* single_quote;
 
 Ignored Tokens
-	blank, line_comment;
+	blank, line_comment;  // Erwthsh gia comment
 	
 Productions
 	programme = commands*;
 	
 	commands ={stat} statement|
-				 {expr}expression;
+				 {func}function;
 	
 	statement ={if}tab* if  comparison semi statement |
-				{while}tab* while comparison semi expression |
+				{while}tab* while comparison semi statement |
 				{for}tab* for [element]:id in [collection]:id semi statement |
 				{return}tab* return expression |
 				{print}tab* print expression comma_expression*|
@@ -97,40 +98,33 @@ Productions
 	multipleargs = comma id assignval?;
 
 	assignval = eq value;
-					 
-					 
-	// Expressions (THELEI AKOMA DOYLEIA)				 
-	expression = {addition} addition |
-					{list_element} id l_bra expression r_bra |
-					{funtion_call} function_call |
-					{value} value |
-					{id} id |
-					{length} len l_par expression r_par |
-					{ascii_val} ascii l_par expression r_par |
-					{min_max} min_max l_par value multiple_values* r_par |
-					{parenthesis_expression} l_par expression r_par |
-					{list} l_bra value multiple_values* r_bra;
-					
-	addition = {multiplication} multiplication |
-				{addition} addition plus multiplication |
-				{subtraction} addition minus multiplication;
+					 			 				
+	expression = {multiplication} multiplication |
+				{addition} expression plus multiplication |
+				{subtraction} expression minus multiplication;
 				
 	multiplication = {multiplication} multiplication mult power |
 						{division} multiplication div power |
 						{modulo} multiplication mod power |
 						{power} power;
 						
-	power = {power} factor pow power |
-				{factor} factor;
+	power = {power} power pow f_expression |
+				{f_expression} f_expression;
 				
-	factor = expression;
+	f_expression = 	{list_element} id l_bra f_expression r_bra |
+					{funtion_call} function_call |
+					{value} value |
+					{id} id |
+					{length} len l_par f_expression r_par |
+					{ascii_val} ascii l_par f_expression r_par |
+					{min_max} min_max l_par value multiple_values* r_par |
+					{parenthesis_expression} l_par f_expression r_par |
+					{list} l_bra value multiple_values* r_bra;
 
 	min_max = {min} min |
 				{max} max;
 				
 	multiple_values = comma value;
-	// End-Expressions
-
 
 	import_call = {import} import module as_ident? cmod_as_ident*|
 					{from_import} from module import id as_ident? cident_as_ident*;
@@ -145,16 +139,18 @@ Productions
 
 	ident_dot = id dot;
 
-	comparison_or = {comp_and} comparison_and|
-					{or} comparison_or or comparison_and;
+	comparison = {or} comparison or comparison_and|
+					{comp_and} comparison_and;
 
-	comparison_and = {comp_not} comparison_not|
-						{and} comparison_and and comparison_not;
+	comparison_and = {and} comparison_and and comparison_not|
+						{comp_not} comparison_not;
+						
 
-	comparison_not = {comparison} comparison|
-						{not} not comparison;
+	comparison_not = {not} not f_comparison|
+						{f_comparison} f_comparison;
+						
 	
-	comparison = {great} [lexpr]:expression great [rexpr]: expression|
+	f_comparison = {great} [lexpr]:expression great [rexpr]: expression|
 					{less} [lexpr]:expression less [rexpr]: expression|
 					{great_eq} [lexpr]:expression great_equal [rexpr]: expression|
 					{less_eq} [lexpr]:expression less_equal [rexpr]: expression|
@@ -168,7 +164,9 @@ Productions
 	arglist = expression comma_expression*;
 
 	value = {func_call} id dot function_call|
-				{number} number|
-				{double_quote_string} string_double_quote|
-				{single_quote_string} string_single_quote|
+				{number} number_literal|
+				{slit}string_literal|
 				{none} none;
+
+	number_literal = {nnumber} minus number|		// Erwthsh gia arnhtikous
+				{pnumber} number;
