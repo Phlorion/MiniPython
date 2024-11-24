@@ -56,17 +56,17 @@ Tokens
 	import = 'import';
 	from = 'from';
 	none = 'None';
-	dot = '.';										// Na doume an mpainei katw apo number
+	dot = '.';										
 	quote = '"';
 	blank = (' ' | lf | cr);
 	line_comment = '#' not_eol* eol; 
-	number = digit+ | digit+ '.' digit+;  			// Erwthsh an thelei float
+	number = digit+ | digit+ '.' digit+;  			
 	id = letter (letter | digit)*;
 	string_literal = quote [not_eol - quote]* quote | 
 					single_quote [not_eol - single_quote]* single_quote;
 
 Ignored Tokens
-	blank, line_comment;  // Erwthsh gia comment
+	blank, line_comment; 
 	
 Productions
 	programme = commands*;
@@ -164,9 +164,6 @@ Productions
 	arglist = expression comma_expression*;
 
 	value = {func_call} id dot function_call|
-				{number} number_literal|
+				{number} number|
 				{slit}string_literal|
 				{none} none;
-
-	number_literal = {nnumber} minus number|		// Erwthsh gia arnhtikous
-				{pnumber} number;
