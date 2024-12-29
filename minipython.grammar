@@ -74,33 +74,36 @@ Ignored Tokens
 	blank, line_comment; 
 	
 Productions
-	programme = commands*;
+	programme = commands*{-> New programme([commands])};
 	
-	commands ={stat} statement|
-				 {func}function;
+	commands ={stat} statement{-> New commands.stat(statement)}|
+				 {func}function{-> New commands.func(function)};
 	
-	statement ={if}tab* if  comparison semi statement |
-				{while}tab* while comparison semi statement |
-				{for}tab* for [element]:id in [collection]:id semi statement |
-				{return}tab* return expression |
-				{print}tab* print expression comma_expression*|
-				{assignop}tab* id assignop expression |
-				{array_assign}tab* id l_bra [index]:expression r_bra eq [right_side]:expression |
-				{assert}tab* assert expression comma_expression? |
-				{func_call}tab* function_call |
-				{import}tab* import_call;
-				
-	comma_expression = comma expression;
+	statement ={if}tab* if  comparison semi statement{-> New statement.if(comparison, statement)}| 	 //isws lathos to comparison se auta
+				{while}tab* while comparison semi statement {-> New statement.while(comparison, statement)}|
+				{for}tab* for [element]:id in [collection]:id semi statement {-> New statement.for(element, collection, statement)}|
+				{return}tab* return expression{-> New statement.return(expression)}|
+				{print}tab* print expression comma_expression*{-> New statement.print(expression, [comma_expression.expression])}| 
+				{assignop}tab* id assignop expression {-> New statement.assignop(id, assignop, expression)}| 	//mporei na mh xreiazetai to assignop sth parenthesi
+				{array_assign}tab* id l_bra [index]:expression r_bra eq [right_side]:expression {-> New statement.array_assign(id, index, right_side)}|
+				{assert}tab* assert expression comma_expression? {-> New statement.assert(expression, [comma_expression.expression])}|
+				{func_call}tab* function_call {-> New statement.func_call(function_call)}| 	//den eimai sigouros ama thelei to geniko function_call h to aplopoihmeno
+				{import}tab* import_call {-> New statement.import(import_call)}; 	// omoiws me panw
 
+	//isws lathos ta comma expr anagwgh se expr
+	comma_expression{-> expression} = comma expression {-> New expression.comma_expression(expression)};
+
+
+	// den jerw an thelei na ginei ast production 
 	assignop = {eq} eq |
 				{mineq} mineq |
 				{diveq} diveq;
 	
-	function = def id l_par arguements? r_par semi statement;
+	function = def id l_par arguements? r_par semi statement {-> New function(id, [arguements], statement)};
 
-	arguements = id assignval? multipleargs*;
+	arguements = id assignval? multipleargs* {-> New arguements(id, [assignval], [multipleargs.arguements])};
 
-	multipleargs = comma id assignval?;
+	multipleargs {-> arguements} = comma id assignval?;   //isws thelei right side ast production
 
 	assignval = eq value;
 					 			 				
@@ -174,6 +177,17 @@ Productions
 				{none} none;
 
 Abstract Syntax Tree
+statement ={if}comparison statement|
+				{while}comparison statement|
+				{for}[element]:id [collection]:id statement|
+				{return}expression|
+				{print}expression expression*| 
+				{assignop}id assignop expression| 
+				{array_assign}id [index]:expression [right_side]:expression|
+				{assert} [l]:expression [comma_exp]:expression*|
+				{func_call}function_call|
+				{import}import_call;
+
 expression = {addition} [l]:expression [r]:expression |
 				{subtraction} [l]:expression [r]:expression |
 				{multiplication} [l]:expression [r]:expression |
