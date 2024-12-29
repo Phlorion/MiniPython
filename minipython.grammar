@@ -172,9 +172,9 @@ Productions
 	arglist = expression comma_expression* {-> New arglist(expression,[comma_expression])}; // Check an to comma_expression prepei na paei sto expression
 
 	value = {func_call} id dot function_call {-> New value.func_call(id,function_call)}|
-				{number} number {-> New value.number()}|
-				{slit}string_literal {-> New value.slit()}|					// Den kserw an einai swsta, mporei na thelei kai ta orismata (number,none,... klp)
-				{none} none {-> New value.none()};
+				{number} number {-> New value.number(number)}|
+				{slit}string_literal {-> New value.slit(string_literal)}|					
+				{none} none {-> New value.none(none)};
 
 Abstract Syntax Tree
 statement ={if}comparison statement|
@@ -236,6 +236,6 @@ function_call = id arglist*;
 arglist = expression comma_expression*;
 
 value = {func_call} id function_call|
-			{number} |
-			{slit} |
-			{none} ;		
+			{number} number|
+			{slit} string_literal|
+			{none} none;		
