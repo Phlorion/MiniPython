@@ -79,33 +79,29 @@ Productions
 	commands ={stat} statement{-> New commands.stat(statement)}|
 				 {func}function{-> New commands.func(function)};
 	
-	statement ={if}tab* if  comparison semi statement{-> New statement.if(comparison, statement)}| 	 //isws lathos to comparison se auta
-				{while}tab* while comparison semi statement {-> New statement.while(comparison, statement)}|
+	statement ={if}tab* if  comparison_or semi statement{-> New statement.if(comparison_or.comparisons, statement)}| 	 //isws lathos to comparison se auta
+				{while}tab* while comparison_or semi statement {-> New statement.while(comparison_or.comparisons, statement)}|
 				{for}tab* for [element]:id in [collection]:id semi statement {-> New statement.for(element, collection, statement)}|
 				{return}tab* return expression{-> New statement.return(expression)}|
 				{print}tab* print expression comma_expression*{-> New statement.print(expression, [comma_expression.expression])}| 
-				{assignop}tab* id assignop expression {-> New statement.assignop(id, assignop, expression)}| 	//mporei na mh xreiazetai to assignop sth parenthesi
+				{assign_eq}tab* id eq expression {-> New statement.assign_eq(id, expression)}| 	//mporei na mh xreiazetai to assignop sth parenthesi
+				{assign_mineq}tab* id eq expression {-> New statement.assign_mineq(id, expression)}|
+				{assign_diveq}tab* id eq expression {-> New statement.assign_diveq(id, expression)}|
 				{array_assign}tab* id l_bra [index]:expression r_bra eq [right_side]:expression {-> New statement.array_assign(id, index, right_side)}|
 				{assert}tab* assert expression comma_expression? {-> New statement.assert(expression, [comma_expression.expression])}|
 				{func_call}tab* function_call {-> New statement.func_call(function_call)}| 	//den eimai sigouros ama thelei to geniko function_call h to aplopoihmeno
 				{import}tab* import_call {-> New statement.import(import_call)}; 	// omoiws me panw
 
 	//isws lathos ta comma expr anagwgh se expr
-	comma_expression{-> expression} = comma expression {-> New expression.comma_expression(expression)};
+	comma_expression{-> expression} = comma expression {-> expression};
 
-
-	// den jerw an thelei na ginei ast production 
-	assignop = {eq} eq |
-				{mineq} mineq |
-				{diveq} diveq;
-	
 	function = def id l_par arguements? r_par semi statement {-> New function(id, [arguements], statement)};
 
-	arguements = id assignval? multipleargs* {-> New arguements(id, [assignval], [multipleargs.arguements])};
+	arguements = id assignval? multipleargs* {-> New arguements(id, [assignval.value], [multipleargs])};
 
-	multipleargs {-> arguements} = comma id assignval?;   //isws thelei right side ast production
+	multipleargs = comma id assignval?{-> New multipleargs(id,[assignval.value])};   //isws thelei right side ast production
 
-	assignval = eq value;
+	assignval {-> value} = eq value {-> value};
 					 			 				
 	expression = {multiplication} multiplication {-> multiplication.expression}|
 				{addition} expression plus multiplication {-> New expression.addition(expression, multiplication.expression)}|
@@ -125,14 +121,12 @@ Productions
 					{id} id {-> New f_expression.id(id)}|
 					{length} len l_par f_expression r_par {-> New f_expression.length(f_expression)}|
 					{ascii_val} ascii l_par f_expression r_par {-> New f_expression.ascii_val(f_expression)}|
-					{min_max} min_max l_par value multiple_values* r_par {-> New f_expression.min_max(value, [multiple_values])}|
+					{min} min l_par value multiple_values* r_par {-> New f_expression.min(value, [multiple_values])}|
+					{max} max l_par value multiple_values* r_par {-> New f_expression.max(value, [multiple_values])}|
 					{parenthesis_expression} l_par f_expression r_par {-> New f_expression.parenthesis_expression(f_expression)}|
 					{list} l_bra value multiple_values* r_bra {-> New f_expression.list(value, [multiple_values])};
-
-	min_max = {min} min |
-				{max} max;
 				
-	multiple_values = comma value;
+	multiple_values{-> value} = comma value {-> value};
 
 	import_call = {import} import module as_ident? cmod_as_ident* {->New import_call.import(module,[as_ident],[cmod_as_ident])}|
 					{from_import} from module import id as_ident? cident_as_ident* {->New import_call.from_import(module,id,[as_ident],[cident_as_ident])};
@@ -147,18 +141,18 @@ Productions
 
 	ident_dot = id dot {->New ident_dot(id)};
 
-	comparison{->comparisons} = {or} comparison or comparison_and {-> New comparisons.or(comparison.comparisons,comparison_and.comparisons)}|
+	comparison_or{->comparisons} = {or} comparison_or or comparison_and {-> New comparisons.or(comparison_or.comparisons,comparison_and.comparisons)}|
 					{comp_and} comparison_and{->comparison_and.comparisons};
 
 	comparison_and{->comparisons} = {and} comparison_and and comparison_not {-> New comparisons.and(comparison_and.comparisons,comparison_not.comparisons)}|
 						{comp_not} comparison_not{->comparison_not.comparisons};
 						
 
-	comparison_not{->comparisons} = {not} not f_comparison {-> New comparisons.not(f_comparison.comparisons)}|
-						{f_comparison} f_comparison {->f_comparison.comparisons};
+	comparison_not{->comparisons} = {not} not comparison {-> New comparisons.not(comparison.comparisons)}|
+						{comparison} comparison {->comparison.comparisons};
 						
 	
-	f_comparison{->comparisons} = {great} [lexpr]:expression great [rexpr]: expression {->New comparisons.great(lexpr,rexpr)}|
+	comparison{->comparisons} = {great} [lexpr]:expression great [rexpr]: expression {->New comparisons.great(lexpr,rexpr)}|
 					{less} [lexpr]:expression less [rexpr]: expression {->New comparisons.less(lexpr,rexpr)}|
 					{great_eq} [lexpr]:expression great_equal [rexpr]: expression {->New comparisons.great_eq(lexpr,rexpr)}|
 					{less_eq} [lexpr]:expression less_equal [rexpr]: expression {->New comparisons.less_eq(lexpr,rexpr)}|
@@ -169,73 +163,89 @@ Productions
 
 	function_call = id l_par arglist? r_par {-> New function_call(id,[arglist])};
 
-	arglist = expression comma_expression* {-> New arglist(expression,[comma_expression])}; // Check an to comma_expression prepei na paei sto expression
-
+	arglist = expression comma_expression* {-> New arglist(expression,[comma_expression.expression])}; 
+	
 	value = {func_call} id dot function_call {-> New value.func_call(id,function_call)}|
 				{number} number {-> New value.number(number)}|
 				{slit}string_literal {-> New value.slit(string_literal)}|					
 				{none} none {-> New value.none(none)};
 
 Abstract Syntax Tree
-statement ={if}comparison statement|
-				{while}comparison statement|
-				{for}[element]:id [collection]:id statement|
-				{return}expression|
-				{print}expression expression*| 
-				{assignop}id assignop expression| 
-				{array_assign}id [index]:expression [right_side]:expression|
-				{assert} [l]:expression [comma_exp]:expression*|
-				{func_call}function_call|
-				{import}import_call;
 
-expression = {addition} [l]:expression [r]:expression |
-				{subtraction} [l]:expression [r]:expression |
-				{multiplication} [l]:expression [r]:expression |
-				{division} [l]:expression [r]:expression |
-				{modulo} [l]:expression [r]:expression |
-				{power} [l]:expression [r]:f_expression |
-				{f_expression} f_expression;
-				
-f_expression = {list_element} id f_expression |
-				{function_call} function_call |
-				{value} value |
-				{id} id |
-				{length} f_expression |
-				{ascii_val} f_expression |
-				{min_max} value multiple_values* |
-				{parenthesis_expression} f_expression |
-				{list} value multiple_values*;
 
-import_call = {import} module as_ident* cmod_as_ident* |
-                    {from_import} module id as_ident* cident_as_ident*;
+	programme = commands*;
+	
+	commands ={stat} statement|
+				 {func}function;
 
-cmod_as_ident = module as_ident*;
+	statement ={if}comparisons statement|
+					{while}comparisons statement|
+					{for}[element]:id [collection]:id statement|
+					{return}expression|
+					{print}[l]:expression [comma_exp]:expression*| 
+					{assign_eq}id expression| 
+					{assign_mineq}id expression|
+					{assign_diveq}id expression|
+					{array_assign}id [index]:expression [right_side]:expression|
+					{assert} [l]:expression [comma_exp]:expression*|
+					{func_call}function_call|
+					{import}import_call;
 
-cident_as_ident = id as_ident*;
+	function = id arguements* statement;
 
-as_ident = id;
+	arguements = id value* multipleargs*;
 
-module = ident_dot* id;
+	multipleargs =  id value*;
 
-ident_dot = id;
+	expression = {addition} [l]:expression [r]:expression |
+					{subtraction} [l]:expression [r]:expression |
+					{multiplication} [l]:expression [r]:expression |
+					{division} [l]:expression [r]:expression |
+					{modulo} [l]:expression [r]:expression |
+					{power} [l]:expression [r]:f_expression |
+					{f_expression} f_expression;
+					
+	f_expression = {list_element} id f_expression |
+					{function_call} function_call |
+					{value} value |
+					{id} id |
+					{length} f_expression |
+					{ascii_val} f_expression |
+					{min} value multiple_values* |
+					{max} value multiple_values* |
+					{parenthesis_expression} f_expression |
+					{list} value multiple_values*;
 
-comparisons = {or} [c1]:comparisons [c2]:comparisons|
-				{and} [c1]: comparisons [c2]: comparisons|
-				{not} comparisons|
-				{great} [lexpr]:expression [rexpr]: expression|
-				{less} [lexpr]:expression [rexpr]: expression|
-				{great_eq} [lexpr]:expression [rexpr]: expression|
-				{less_eq} [lexpr]:expression [rexpr]: expression|
-				{not_eq} [lexpr]:expression [rexpr]: expression|
-				{comp_eq} [lexpr]:expression [rexpr]: expression|
-				{true} |
-				{false} ;
+	import_call = {import} module as_ident* cmod_as_ident* |
+						{from_import} module id as_ident* cident_as_ident*;
 
-function_call = id arglist*;
+	cmod_as_ident = module as_ident*;
 
-arglist = expression comma_expression*;
+	cident_as_ident = id as_ident*;
 
-value = {func_call} id function_call|
-			{number} number|
-			{slit} string_literal|
-			{none} none;		
+	as_ident = id;
+
+	module = ident_dot* id;
+
+	ident_dot = id;
+
+	comparisons = {or} [c1]:comparisons [c2]:comparisons|
+					{and} [c1]: comparisons [c2]: comparisons|
+					{not} comparisons|
+					{great} [lexpr]:expression [rexpr]: expression|
+					{less} [lexpr]:expression [rexpr]: expression|
+					{great_eq} [lexpr]:expression [rexpr]: expression|
+					{less_eq} [lexpr]:expression [rexpr]: expression|
+					{not_eq} [lexpr]:expression [rexpr]: expression|
+					{comp_eq} [lexpr]:expression [rexpr]: expression|
+					{true} |
+					{false} ;
+
+	function_call = id arglist*;
+
+	arglist = expression comma_expression*;
+
+	value = {func_call} id function_call|
+				{number} number|
+				{slit} string_literal|
+				{none} none;		
