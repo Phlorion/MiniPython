@@ -85,8 +85,8 @@ Productions
 				{return}tab* return expression{-> New statement.return(expression)}|
 				{print}tab* print expression comma_expression*{-> New statement.print(expression, [comma_expression.expression])}| 
 				{assign_eq}tab* id eq expression {-> New statement.assign_eq(id, expression)}| 	//mporei na mh xreiazetai to assignop sth parenthesi
-				{assign_mineq}tab* id eq expression {-> New statement.assign_mineq(id, expression)}|
-				{assign_diveq}tab* id eq expression {-> New statement.assign_diveq(id, expression)}|
+				{assign_mineq}tab* id mineq expression {-> New statement.assign_mineq(id, expression)}|
+				{assign_diveq}tab* id diveq expression {-> New statement.assign_diveq(id, expression)}|
 				{array_assign}tab* id l_bra [index]:expression r_bra eq [right_side]:expression {-> New statement.array_assign(id, index, right_side)}|
 				{assert}tab* assert expression comma_expression? {-> New statement.assert(expression, [comma_expression.expression])}|
 				{func_call}tab* function_call {-> New statement.func_call(function_call)}| 	//den eimai sigouros ama thelei to geniko function_call h to aplopoihmeno
@@ -115,19 +115,17 @@ Productions
 	power{->expression} = {power} power pow f_expression {-> New expression.power(power.expression, f_expression.expression)}|
 				{f_expression} f_expression {-> f_expression.expression};
 				
-	f_expression{-> expression} = {list_element} id l_bra f_expression r_bra {-> New expression.list_element(id, f_expression)}|
-					{funtion_call} function_call {-> New expression.function_call(funtion_call)}|
+	f_expression{-> expression} = {list_element} id l_bra expression r_bra {-> New expression.list_element(id,expression)}|
+					{funtion_call} function_call {-> New expression.function_call(function_call.function_call)}|
 					{value} value {-> New expression.value(value)}|
 					{id} id {-> New expression.id(id)}|
-					{length} len l_par f_expression r_par {-> New expression.length(f_expression)}|
-					{ascii_val} ascii l_par f_expression r_par {-> New expression.ascii_val(f_expression)}|
-					{min_max} min_max l_par value multiple_values* r_par {-> New expression.min_max(value, [multiple_values])}|
-					{parenthesis_expression} l_par f_expression r_par {-> New expression.parenthesis_expression(f_expression)}|
-					{list} l_bra value multiple_values* r_bra {-> New expression.list(value, [multiple_values])};
-
-	min_max = {min} min |
-				{max} max;
-				
+					{length} len l_par expression r_par {-> New expression.length(expression)}|
+					{ascii_val} ascii l_par expression r_par {-> New expression.ascii_val(expression)}|
+					{min} min l_par value multiple_values* r_par {-> New expression.min(value, [multiple_values.value])}|
+					{max} max l_par value multiple_values* r_par {-> New expression.max(value, [multiple_values.value])}|
+					{parenthesis_expression} l_par expression r_par {-> New expression.parenthesis_expression(expression)}|
+					{list} l_bra value multiple_values* r_bra {-> New expression.list(value, [multiple_values.value])};
+		
 	multiple_values{-> value} = comma value {-> value};
 
 	import_call = {import} import module as_ident? cmod_as_ident* {->New import_call.import(module,[as_ident],[cmod_as_ident])}|
@@ -174,22 +172,7 @@ Productions
 
 Abstract Syntax Tree
 
-expression = {addition} [l]:expression [r]:expression |
-				{subtraction} [l]:expression [r]:expression |
-				{multiplication} [l]:expression [r]:expression |
-				{division} [l]:expression [r]:expression |
-				{modulo} [l]:expression [r]:expression |
-				{power} [l]:expression [r]:expression |
-				{list_element} id expression |
-				{function_call} function_call |
-				{value} value |
-				{id} id |
-				{length} expression |
-				{ascii_val} expression |
-				{min_max} value multiple_values* |
-				{parenthesis_expression} expression |
-				{list} value multiple_values*;
-
+	
 	programme = commands*;
 	
 	commands ={stat} statement|
@@ -214,7 +197,22 @@ expression = {addition} [l]:expression [r]:expression |
 
 	multipleargs =  id value*;
 
-
+	expression = {addition} [l]:expression [r]:expression |
+					{subtraction} [l]:expression [r]:expression |
+					{multiplication} [l]:expression [r]:expression |
+					{division} [l]:expression [r]:expression |
+					{modulo} [l]:expression [r]:expression |
+					{power} [l]:expression [r]:expression |
+					{list_element} id expression |
+					{function_call} function_call |
+					{value} value |
+					{id} id |
+					{length} expression |
+					{ascii_val} expression |
+					{min} [lvalue]:value [mult_vals]:value* |
+					{max} [lvalue]:value [mult_vals]:value* |
+					{parenthesis_expression} expression |
+					{list} [lvalue]:value [mult_vals]:value*;
 
 	import_call = {import} module as_ident* cmod_as_ident* |
 						{from_import} module id as_ident* cident_as_ident*;
@@ -243,7 +241,7 @@ expression = {addition} [l]:expression [r]:expression |
 
 	function_call = id arglist*;
 
-	arglist = expression comma_expression*;
+	arglist = [l]:expression [mult_exprs]:expression*;
 
 	value = {func_call} id function_call|
 				{number} number|
