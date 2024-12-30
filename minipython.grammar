@@ -112,19 +112,21 @@ Productions
 						{modulo} multiplication mod power {-> New expression.modulo(multiplication.expression, power.expression)}|
 						{power} power {-> power.expression};
 						
-	power{->expression} = {power} power pow f_expression {-> New expression.power(power.expression, f_expression)}|
-				{f_expression} f_expression;
+	power{->expression} = {power} power pow f_expression {-> New expression.power(power.expression, f_expression.expression)}|
+				{f_expression} f_expression {-> f_expression.expression};
 				
-	f_expression = {list_element} id l_bra f_expression r_bra {-> New f_expression.list_element(id, f_expression)}|
-					{funtion_call} function_call {-> New f_expression.function_call(funtion_call)}|
-					{value} value {-> New f_expression.value(value)}|
-					{id} id {-> New f_expression.id(id)}|
-					{length} len l_par f_expression r_par {-> New f_expression.length(f_expression)}|
-					{ascii_val} ascii l_par f_expression r_par {-> New f_expression.ascii_val(f_expression)}|
-					{min} min l_par value multiple_values* r_par {-> New f_expression.min(value, [multiple_values])}|
-					{max} max l_par value multiple_values* r_par {-> New f_expression.max(value, [multiple_values])}|
-					{parenthesis_expression} l_par f_expression r_par {-> New f_expression.parenthesis_expression(f_expression)}|
-					{list} l_bra value multiple_values* r_bra {-> New f_expression.list(value, [multiple_values])};
+	f_expression{-> expression} = {list_element} id l_bra f_expression r_bra {-> New expression.list_element(id, f_expression)}|
+					{funtion_call} function_call {-> New expression.function_call(funtion_call)}|
+					{value} value {-> New expression.value(value)}|
+					{id} id {-> New expression.id(id)}|
+					{length} len l_par f_expression r_par {-> New expression.length(f_expression)}|
+					{ascii_val} ascii l_par f_expression r_par {-> New expression.ascii_val(f_expression)}|
+					{min_max} min_max l_par value multiple_values* r_par {-> New expression.min_max(value, [multiple_values])}|
+					{parenthesis_expression} l_par f_expression r_par {-> New expression.parenthesis_expression(f_expression)}|
+					{list} l_bra value multiple_values* r_bra {-> New expression.list(value, [multiple_values])};
+
+	min_max = {min} min |
+				{max} max;
 				
 	multiple_values{-> value} = comma value {-> value};
 
@@ -172,6 +174,21 @@ Productions
 
 Abstract Syntax Tree
 
+expression = {addition} [l]:expression [r]:expression |
+				{subtraction} [l]:expression [r]:expression |
+				{multiplication} [l]:expression [r]:expression |
+				{division} [l]:expression [r]:expression |
+				{modulo} [l]:expression [r]:expression |
+				{power} [l]:expression [r]:expression |
+				{list_element} id expression |
+				{function_call} function_call |
+				{value} value |
+				{id} id |
+				{length} expression |
+				{ascii_val} expression |
+				{min_max} value multiple_values* |
+				{parenthesis_expression} expression |
+				{list} value multiple_values*;
 
 	programme = commands*;
 	
@@ -197,24 +214,7 @@ Abstract Syntax Tree
 
 	multipleargs =  id value*;
 
-	expression = {addition} [l]:expression [r]:expression |
-					{subtraction} [l]:expression [r]:expression |
-					{multiplication} [l]:expression [r]:expression |
-					{division} [l]:expression [r]:expression |
-					{modulo} [l]:expression [r]:expression |
-					{power} [l]:expression [r]:f_expression |
-					{f_expression} f_expression;
-					
-	f_expression = {list_element} id f_expression |
-					{function_call} function_call |
-					{value} value |
-					{id} id |
-					{length} f_expression |
-					{ascii_val} f_expression |
-					{min} value multiple_values* |
-					{max} value multiple_values* |
-					{parenthesis_expression} f_expression |
-					{list} value multiple_values*;
+
 
 	import_call = {import} module as_ident* cmod_as_ident* |
 						{from_import} module id as_ident* cident_as_ident*;
