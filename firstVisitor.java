@@ -1,9 +1,10 @@
 import minipython.analysis.*;
 import minipython.node.*;
+
 import java.util.*;
 
 public class firstVisitor extends DepthFirstAdapter  {
-    private Hashtable symtable;	
+    private Hashtable symtable; 
 
 	firstVisitor(Hashtable symtable) 
 	{
@@ -40,4 +41,46 @@ public class firstVisitor extends DepthFirstAdapter  {
 
     
     }
+
+
+    /**
+     * Check for 'None' in operations
+     */
+    private void inOperationExpression(PExpression first, PExpression second) {
+        // check left part of the operation
+        if (first instanceof AValueExpression) {
+            AValueExpression valueExp = (AValueExpression) first;
+            if (valueExp.getValue() instanceof ANoneValue) {
+                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
+                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+            }
+        }
+        
+        // check right part of the operation
+        if (second instanceof AValueExpression) {
+            AValueExpression valueExp = (AValueExpression) second;
+            if (valueExp.getValue() instanceof ANoneValue) {
+                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
+                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+            }
+        }
+    }
+
+    // addition
+    public void inAAdditionExpression(AAdditionExpression node) {
+        PExpression firstExp = node.getL();
+        PExpression secondExp = node.getR();
+        
+        inOperationExpression(firstExp, secondExp);
+    }
+
+    // subtraction
+    public void inASubtractionExpression(ASubtractionExpression node) {
+        PExpression firstExp = node.getL();
+        PExpression secondExp = node.getR();
+        
+        inOperationExpression(firstExp, secondExp);
+    }
+
+    // multiplication
 }
