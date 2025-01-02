@@ -17,8 +17,9 @@ public class ParserTest
         new FileReader(args[0].toString()), 1024)));
 
      Hashtable symtable =  new Hashtable();
+     Hashtable valuetable = new Hashtable();
      Start ast = parser.parse();
-     ast.apply(new firstVisitor(symtable));
+     ast.apply(new firstVisitor(symtable,valuetable));
      /* Gia ton deutero visitor grapste thn entolh
       * ast.apply(new mysecondvisitor(symtable));
       */
