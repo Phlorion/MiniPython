@@ -144,13 +144,13 @@ public class firstVisitor extends DepthFirstAdapter  {
     /**
      * Check for 'None' in operations
      */
-    private void inOperationExpression(PExpression first, PExpression second) {
+    private void inOperationExpression(PExpression first, PExpression second, String operation) {
         // check left part of the operation
         if (first instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) first;
             if (valueExp.getValue() instanceof ANoneValue) {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
-                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+                System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
         }
         
@@ -159,7 +159,7 @@ public class firstVisitor extends DepthFirstAdapter  {
             AValueExpression valueExp = (AValueExpression) second;
             if (valueExp.getValue() instanceof ANoneValue) {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
-                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+                System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
         }
     }
@@ -170,19 +170,19 @@ public class firstVisitor extends DepthFirstAdapter  {
         PExpression right = node.getR();
         if (left instanceof AIdExpression){
             TId id = ((AIdExpression)left).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
         if (right instanceof AIdExpression){
             TId id = ((AIdExpression)right).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
 
         // check if adding with None keyword
-        inOperationExpression(left, right);
+        inOperationExpression(left, right, "addition");
     }
 
     public void inASubtractionExpression (ASubtractionExpression node){
@@ -190,19 +190,19 @@ public class firstVisitor extends DepthFirstAdapter  {
         PExpression right = node.getR();
         if(left instanceof AIdExpression){
             TId id = ((AIdExpression)left).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
         if(right instanceof AIdExpression){
             TId id = ((AIdExpression)right).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
 
         // check if subtracting with None keyword
-        inOperationExpression(left, right);
+        inOperationExpression(left, right, "subtraction");
     }
 
     public void inAMultiplicationExpression (AMultiplicationExpression node){
@@ -210,16 +210,19 @@ public class firstVisitor extends DepthFirstAdapter  {
         PExpression right = node.getR();
         if(left instanceof AIdExpression){
             TId id = ((AIdExpression)left).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
         if(right instanceof AIdExpression){
             TId id = ((AIdExpression)right).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
+
+        // check if multiplying with None keyword
+        inOperationExpression(left, right, "multiplication");
     }
 
     public void inADivisionExpression (ADivisionExpression node){
@@ -227,19 +230,62 @@ public class firstVisitor extends DepthFirstAdapter  {
         PExpression right = node.getR();
         if(left instanceof AIdExpression){
             TId id = ((AIdExpression)left).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
         if(right instanceof AIdExpression){
             TId id = ((AIdExpression)right).getId();
-                if(!symtable.containsKey(id.toString())){
-                    System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
-                }
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
         }
+
+        // check if dividing with None keyword
+        inOperationExpression(left, right, "division");
     }
 
     
+    public void inAModuloExpression(AModuloExpression node) {
+        PExpression left = node.getL();
+        PExpression right = node.getR();
+        if(left instanceof AIdExpression){
+            TId id = ((AIdExpression)left).getId();
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
+        }
+        if(right instanceof AIdExpression){
+            TId id = ((AIdExpression)right).getId();
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
+        }
+
+        // check if modulo with None keyword
+        inOperationExpression(left, right, "modulo");
+    }
+
+    public void inAPowerExpression(APowerExpression node) {
+        PExpression left = node.getL();
+        PExpression right = node.getR();
+        if(left instanceof AIdExpression){
+            TId id = ((AIdExpression)left).getId();
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
+        }
+        if(right instanceof AIdExpression){
+            TId id = ((AIdExpression)right).getId();
+            if(!symtable.containsKey(id.toString())){
+                System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
+            }
+        }
+
+        // check if powering with None keyword
+        inOperationExpression(left, right, "power");
+    }
+
     // list element expression
     public void inAListElementExpression (AListElementExpression node){
         TId id = node.getId();
