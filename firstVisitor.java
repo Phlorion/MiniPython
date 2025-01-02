@@ -1,6 +1,5 @@
 import minipython.analysis.*;
 import minipython.node.*;
-
 import java.util.*;
 
 public class firstVisitor extends DepthFirstAdapter  {
@@ -85,6 +84,7 @@ public class firstVisitor extends DepthFirstAdapter  {
                 }
             }
         }
+    }
 
     // return statement
     public void inAReturnStatement(AReturnStatement node){
@@ -141,22 +141,48 @@ public class firstVisitor extends DepthFirstAdapter  {
     //     }
     // }
 
+    /**
+     * Check for 'None' in operations
+     */
+    private void inOperationExpression(PExpression first, PExpression second) {
+        // check left part of the operation
+        if (first instanceof AValueExpression) {
+            AValueExpression valueExp = (AValueExpression) first;
+            if (valueExp.getValue() instanceof ANoneValue) {
+                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
+                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+            }
+        }
+        
+        // check right part of the operation
+        if (second instanceof AValueExpression) {
+            AValueExpression valueExp = (AValueExpression) second;
+            if (valueExp.getValue() instanceof ANoneValue) {
+                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
+                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
+            }
+        }
+    }
+
     // arithmetic expressions
     public void inAAdditionExpression (AAdditionExpression node){
         PExpression left = node.getL();
         PExpression right = node.getR();
-        if(left instanceof AIdExpression){
+        if (left instanceof AIdExpression){
             TId id = ((AIdExpression)left).getId();
                 if(!symtable.containsKey(id.toString())){
                     System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
                 }
         }
-        if(right instanceof AIdExpression){
+        if (right instanceof AIdExpression){
             TId id = ((AIdExpression)right).getId();
                 if(!symtable.containsKey(id.toString())){
                     System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
                 }
         }
+
+        // check if adding with None keyword
+        inOperationExpression(left, right);
     }
 
     public void inASubtractionExpression (ASubtractionExpression node){
@@ -174,6 +200,9 @@ public class firstVisitor extends DepthFirstAdapter  {
                     System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
                 }
         }
+
+        // check if subtracting with None keyword
+        inOperationExpression(left, right);
     }
 
     public void inAMultiplicationExpression (AMultiplicationExpression node){
@@ -376,8 +405,6 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
     }
 
-
-
     // id.func_call value
     public void inAFuncCallValue (AFuncCallValue node){
             TId id = node.getId();
@@ -385,46 +412,4 @@ public class firstVisitor extends DepthFirstAdapter  {
                 System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
             }
     }
-
-
-    /**
-     * Check for 'None' in operations
-     */
-    private void inOperationExpression(PExpression first, PExpression second) {
-        // check left part of the operation
-        if (first instanceof AValueExpression) {
-            AValueExpression valueExp = (AValueExpression) first;
-            if (valueExp.getValue() instanceof ANoneValue) {
-                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
-                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
-            }
-        }
-        
-        // check right part of the operation
-        if (second instanceof AValueExpression) {
-            AValueExpression valueExp = (AValueExpression) second;
-            if (valueExp.getValue() instanceof ANoneValue) {
-                TNone none = ((ANoneValue) valueExp.getValue()).getNone();
-                System.out.println("Line: " + none.getLine() + ", Cannot perform operation with keyword " + none.toString().trim());
-            }
-        }
-    }
-
-    // addition
-    public void inAAdditionExpression(AAdditionExpression node) {
-        PExpression firstExp = node.getL();
-        PExpression secondExp = node.getR();
-        
-        inOperationExpression(firstExp, secondExp);
-    }
-
-    // subtraction
-    public void inASubtractionExpression(ASubtractionExpression node) {
-        PExpression firstExp = node.getL();
-        PExpression secondExp = node.getR();
-        
-        inOperationExpression(firstExp, secondExp);
-    }
-
-    // multiplication
 }
