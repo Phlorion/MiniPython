@@ -116,7 +116,7 @@ Productions
 				{f_expression} f_expression {-> f_expression.expression};
 				
 	f_expression{-> expression} = {list_element} id l_bra expression r_bra {-> New expression.list_element(id,expression)}|
-					{funtion_call} function_call {-> New expression.function_call(function_call.function_call)}|
+					{funtion_call} function_call {-> New expression.function_call(function_call)}|
 					{value} value {-> New expression.value(value)}|
 					{id} id {-> New expression.id(id)}|
 					{length} len l_par expression r_par {-> New expression.length(expression)}|
