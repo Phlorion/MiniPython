@@ -120,7 +120,7 @@ Productions
 					{value} value {-> New expression.value(value)}|
 					{id} id {-> New expression.id(id)}|
 					{length} len l_par expression r_par {-> New expression.length(expression)}|
-					{ascii_val} ascii l_par expression r_par {-> New expression.ascii_val(expression)}|
+					{ascii_val} ascii l_par id r_par {-> New expression.ascii_val(id)}|
 					{min} min l_par value multiple_values* r_par {-> New expression.min(value, [multiple_values.value])}|
 					{max} max l_par value multiple_values* r_par {-> New expression.max(value, [multiple_values.value])}|
 					{parenthesis_expression} l_par expression r_par {-> New expression.parenthesis_expression(expression)}|
@@ -208,7 +208,7 @@ Abstract Syntax Tree
 					{value} value |
 					{id} id |
 					{length} expression |
-					{ascii_val} expression |
+					{ascii_val} id |
 					{min} [lvalue]:value [mult_vals]:value* |
 					{max} [lvalue]:value [mult_vals]:value* |
 					{parenthesis_expression} expression |
