@@ -22,7 +22,24 @@ public class firstVisitor extends DepthFirstAdapter  {
 		int line = node.getId().getLine();
         int pos = node.getId().getPos();
 		symtable.put(varName, node);
-        // System.out.println("Oristike sti grammh " + line + " h metablhth " + varName);
+        // keep track of each variable's value type
+        PExpression rhs = node.getExpression();
+        if (rhs instanceof AValueExpression){
+            PValue val = ((AValueExpression)rhs).getValue();
+
+            if(val instanceof ANoneValue){
+                valuetable.put(varName, "none");
+            }
+            else if (val instanceof ANumberValue){
+                valuetable.put(varName, "num");
+            }
+            else if (val instanceof ASlitValue){
+                valuetable.put(varName, "str");
+            }
+            else {
+                valuetable.put(varName, "func_call");
+            }
+        }
 	}
 
     public void inAAssignMineqStatement (AAssignMineqStatement node){
