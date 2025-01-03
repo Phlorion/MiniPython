@@ -3,11 +3,14 @@ import minipython.node.*;
 import java.util.*;
 
 public class firstVisitor extends DepthFirstAdapter  {
+    @SuppressWarnings("rawtypes")
     private Hashtable symtable;	
+    @SuppressWarnings("rawtypes")
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
 
-	firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
+	@SuppressWarnings("rawtypes")
+    firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
@@ -16,7 +19,8 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // assign statements
-	public void inAAssignEqStatement(AAssignEqStatement node) 
+	@SuppressWarnings({ "unchecked", "unused" })
+    public void inAAssignEqStatement(AAssignEqStatement node) 
 	{
 		String varName = node.getId().toString();
 		int line = node.getId().getLine();
@@ -482,6 +486,7 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // Check function definition
+    @SuppressWarnings("unchecked")
     public void inAFunction (AFunction node){
         boolean prevArgDefault = false;
         boolean errorInArgs = false;
