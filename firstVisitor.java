@@ -22,6 +22,7 @@ public class firstVisitor extends DepthFirstAdapter  {
 		int line = node.getId().getLine();
         int pos = node.getId().getPos();
 		symtable.put(varName, node);
+
         // keep track of each variable's value type
         PExpression rhs = node.getExpression();
         if (rhs instanceof AValueExpression){
