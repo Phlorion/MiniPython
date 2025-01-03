@@ -485,7 +485,7 @@ public class firstVisitor extends DepthFirstAdapter  {
     public void inAFunction (AFunction node){
         boolean prevArgDefault = false;
         boolean errorInArgs = false;
-        boolean functionConfict = false;
+        boolean functionConflict = false;
         int requiredArgs = 0;
         int defaultArgs = 0;
         String functionName = node.getId().getText();
@@ -500,10 +500,10 @@ public class firstVisitor extends DepthFirstAdapter  {
                 for(FunctionSignature functionSignature: functionsMap.get(functionName)){
                     if(functionSignature.getRequiredArgs() == 0){ // Prosthetoume thn foo(). An uparxei hdh foo() h uparxei foo(a=1,b=1,..) error
                         System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
-                        functionConfict = true;
+                        functionConflict = true;
                     }
                 }
-                if(!functionConfict){ 
+                if(!functionConflict){ 
                     functionsMap.get(functionName).add(new FunctionSignature(0, 0));
                 }
             }
@@ -512,6 +512,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         else{                           // Periptwsh pou exei 1 toulaxiston argument
             AArguements aArguments = (AArguements) arguments.get(0);
             String firstArg = aArguments.getId().toString();
+            symtable.put(firstArg, node);
             if(aArguments.getValue().size() == 0){
                 requiredArgs = 1;
             }else{
@@ -530,6 +531,7 @@ public class firstVisitor extends DepthFirstAdapter  {
                     defaultArgs++;
                     prevArgDefault = true;
                 }
+                symtable.put(aMultArg.getId().toString(), node);
             }
             if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):
                 System.out.println("Line " + node.getId().getLine() + ": non-default argument follows default argument");
@@ -542,12 +544,12 @@ public class firstVisitor extends DepthFirstAdapter  {
                 }
                 else{
                     for(FunctionSignature functionSignature: functionsMap.get(functionName)){
-                        if(functionConfict(requiredArgs,defaultArgs,functionSignature)){
+                        if(functionConflict(requiredArgs,defaultArgs,functionSignature)){
                             System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
-                            functionConfict = true;
+                            functionConflict = true;
                         } 
                     }
-                    if(!functionConfict){
+                    if(!functionConflict){
                         functionsMap.get(functionName).add(new FunctionSignature(requiredArgs, defaultArgs));
                     }
                 }
@@ -560,7 +562,7 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // Basismenh sta error pou exei h ekfwnhsh
-    public boolean functionConfict(int requiredArgs, int defaultArgs, FunctionSignature fs){
+    public boolean functionConflict(int requiredArgs, int defaultArgs, FunctionSignature fs){
 
         if(defaultArgs > 0 && fs.getRequiredArgs()-requiredArgs<=defaultArgs){     //Case 1
             return true;
