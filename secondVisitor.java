@@ -3,18 +3,22 @@ import minipython.node.*;
 import java.util.*;
 
 public class secondVisitor extends DepthFirstAdapter  {
+    @SuppressWarnings({ "rawtypes", "unused" })
     private Hashtable symtable;	
+    @SuppressWarnings({ "unused", "rawtypes" })
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
 
-	secondVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
+	@SuppressWarnings("rawtypes")
+    secondVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
         this.functionsMap = functionsMap;
 	}
 
-
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void inAFunctionCall(AFunctionCall node){
         String functionName = node.getId().getText();
         int line = node.getId().getLine();
@@ -24,7 +28,12 @@ public class secondVisitor extends DepthFirstAdapter  {
         }
         else{
             // check if arguments are aligned with any function signature
-            LinkedList args = node.getArglist();
+            LinkedList argListObj = node.getArglist();
+            AArglist argListProduction = (AArglist)argListObj.getFirst();
+            
+            ArrayList args = new ArrayList<PExpression>();
+            args.add(argListProduction.getL());
+            args.addAll(argListProduction.getMultExprs());
             int args_size = args.size();
             List func_signatures = functionsMap.get(functionName);
             boolean found_signature = false;
@@ -35,6 +44,7 @@ public class secondVisitor extends DepthFirstAdapter  {
                 int required_args = fs.getRequiredArgs();
                 if(args_size > default_args + required_args || args_size < required_args){
                     //incorrect signature
+                    continue;
                 }
                 else{
                     //correct signature
