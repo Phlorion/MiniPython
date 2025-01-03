@@ -5,11 +5,13 @@ import java.util.*;
 public class firstVisitor extends DepthFirstAdapter  {
     private Hashtable symtable;	
     private Hashtable valuetable;
+    private Map<String, List<FunctionSignature>> functionsMap;
 
-	firstVisitor(Hashtable symtable, Hashtable valuetable) 
+	firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
+        this.functionsMap = functionsMap;
 	}
 
 
@@ -457,5 +459,104 @@ public class firstVisitor extends DepthFirstAdapter  {
             if(!symtable.containsKey(id.toString())){
                 System.out.println("Line: " + id.getLine() + " Column: " + id.getPos() + ", variable " + id.toString().trim() + " not defined");
             }
+    }
+
+
+
+    // Check function definition
+    public void inAFunction (AFunction node){
+        boolean prevArgDefault = false;
+        boolean errorInArgs = false;
+        boolean functionConfict = false;
+        int requiredArgs = 0;
+        int defaultArgs = 0;
+        String functionName = node.getId().getText();
+        List<PArguements> arguments = node.getArguements();
+        if(arguments.size() == 0){      // Periptwsh pou den exei arguments def foo(): ...
+            if(!functionsMap.containsKey(functionName)){
+                List<FunctionSignature> tempList = new ArrayList<>();
+                tempList.add(new FunctionSignature(0, 0));
+                functionsMap.put(functionName,tempList);
+            }
+            else{
+                for(FunctionSignature functionSignature: functionsMap.get(functionName)){
+                    if(functionSignature.getRequiredArgs() == 0){ // Prosthetoume thn foo(). An uparxei hdh foo() h uparxei foo(a=1,b=1,..) error
+                        System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
+                        functionConfict = true;
+                    }
+                }
+                if(!functionConfict){ 
+                    functionsMap.get(functionName).add(new FunctionSignature(0, 0));
+                }
+            }
+            //System.out.println("Oristike " + functionName + " me 0 orismata");
+        }
+        else{                           // Periptwsh pou exei 1 toulaxiston argument
+            AArguements aArguments = (AArguements) arguments.get(0);
+            String firstArg = aArguments.getId().toString();
+            if(aArguments.getValue().size() == 0){
+                requiredArgs = 1;
+            }else{
+                defaultArgs = 1;
+                prevArgDefault = true;
+            }
+            for(Object o: aArguments.getMultipleargs()){
+                AMultipleargs aMultArg = (AMultipleargs) o;
+                if(aMultArg.getValue().size() == 0){
+                    requiredArgs++;
+                    if(prevArgDefault == true){
+                        errorInArgs = true;
+                    }
+                }
+                else{
+                    defaultArgs++;
+                    prevArgDefault = true;
+                }
+            }
+            if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):
+                System.out.println("Line " + node.getId().getLine() + ": non-default argument follows default argument");
+            }
+            else{
+                if(!functionsMap.containsKey(functionName)){
+                    List<FunctionSignature> tempList = new ArrayList<>();
+                    tempList.add(new FunctionSignature(requiredArgs, defaultArgs));
+                    functionsMap.put(functionName,tempList);
+                }
+                else{
+                    for(FunctionSignature functionSignature: functionsMap.get(functionName)){
+                        if(functionConfict(requiredArgs,defaultArgs,functionSignature)){
+                            System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
+                            functionConfict = true;
+                        } 
+                    }
+                    if(!functionConfict){
+                        functionsMap.get(functionName).add(new FunctionSignature(requiredArgs, defaultArgs));
+                    }
+                }
+            }
+            //System.out.println("Oristike " + functionName + " me orismata required: " + requiredArgs + " default: " + defaultArgs);
+        }
+        
+
+    }
+
+
+    // Basismenh sta error pou exei h ekfwnhsh
+    public boolean functionConfict(int requiredArgs, int defaultArgs, FunctionSignature fs){
+
+        if(defaultArgs > 0 && fs.getRequiredArgs()-requiredArgs<=defaultArgs){     //Case 1
+            return true;
+        }
+
+        if(fs.getDefaultArgs() == defaultArgs && fs.getRequiredArgs() == requiredArgs){ //Case 2
+            return true;
+        }
+
+        if(fs.getDefaultArgs()+fs.getRequiredArgs() == requiredArgs+defaultArgs){
+            return true;
+        }
+
+
+        return false;
     }
 }

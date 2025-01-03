@@ -14,12 +14,14 @@ public class ParserTest
         new Parser(
         new Lexer(
         new PushbackReader(
-        new FileReader(args[0].toString()), 1024)));
+        new FileReader("exampleFunctions.py"), 1024)));
 
      Hashtable symtable =  new Hashtable();
      Hashtable valuetable = new Hashtable();
+     Map<String, List<FunctionSignature>> functionsMap = new HashMap<>();
      Start ast = parser.parse();
-     ast.apply(new firstVisitor(symtable,valuetable));
+     ast.apply(new firstVisitor(symtable,valuetable,functionsMap));
+     ast.apply(new secondVisitor(symtable, valuetable, functionsMap));
      /* Gia ton deutero visitor grapste thn entolh
       * ast.apply(new mysecondvisitor(symtable));
       */
