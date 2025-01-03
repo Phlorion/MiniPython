@@ -166,9 +166,11 @@ public class firstVisitor extends DepthFirstAdapter  {
     // }
 
     /**
-     * Check for 'None' in operations
+     * Check for 'None' and different value types in operations
      */
     private void inOperationExpression(PExpression first, PExpression second, String operation) {
+        String f_type = "";
+        int line = 0;
         // check left part of the operation
         if (first instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) first;
@@ -176,8 +178,38 @@ public class firstVisitor extends DepthFirstAdapter  {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
                 System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
+            else if (valueExp.getValue() instanceof ANumberValue){
+                f_type = "num";
+                line = ((ANumberValue)valueExp.getValue()).getNumber().getLine();
+            }
+            else if(valueExp.getValue() instanceof ASlitValue){
+                f_type = "str";
+                line = ((ASlitValue)valueExp.getValue()).getStringLiteral().getLine();
+            }
+            else{
+                f_type = "func_call";
+                line = ((AFuncCallValue)valueExp.getValue()).getId().getLine();
+            }
+        }
+        else if(first instanceof AFunctionCallExpression){
+            f_type = "func_call";
+            line = ((AFunctionCall)((AFunctionCallExpression)first).getFunctionCall()).getId().getLine();
+        }
+        else if(first instanceof AIdExpression){
+            f_type = (String) valuetable.get(((AIdExpression)first).getId().toString());
+            line = ((AIdExpression)first).getId().getLine();
+        }
+        else if(first instanceof ALengthExpression || first instanceof AMinExpression || first instanceof AMaxExpression || first instanceof APowerExpression ||
+        first instanceof AMultiplicationExpression || first instanceof AModuloExpression || first instanceof ADivisionExpression){
+            f_type = "num";
+            line = 0; //too bored to calculate all if statements
+        }
+        else if(first instanceof AAsciiValExpression){
+            f_type = "str";
+            line = ((AAsciiValExpression)first).getId().getLine();
         }
         
+        String s_type = "";
         // check right part of the operation
         if (second instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) second;
@@ -185,6 +217,46 @@ public class firstVisitor extends DepthFirstAdapter  {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
                 System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
+            else if (valueExp.getValue() instanceof ANumberValue){
+                s_type = "num";
+                line = ((ANumberValue)valueExp.getValue()).getNumber().getLine();
+            }
+            else if(valueExp.getValue() instanceof ASlitValue){
+                s_type = "str";
+                line = ((ASlitValue)valueExp.getValue()).getStringLiteral().getLine();
+            }
+            else{
+                s_type = "func_call";
+                line = ((AFuncCallValue)valueExp.getValue()).getId().getLine();
+            }
+        }
+        else if(second instanceof AFunctionCallExpression){
+            s_type = "func_call";
+            line = ((AFunctionCall)((AFunctionCallExpression)second).getFunctionCall()).getId().getLine();
+        }
+        else if(second instanceof AIdExpression){
+            s_type = (String) valuetable.get(((AIdExpression)second).getId().toString());
+            line = ((AIdExpression)second).getId().getLine();
+        }
+        else if(second instanceof ALengthExpression || second instanceof AMinExpression || second instanceof AMaxExpression || second instanceof APowerExpression ||
+        second instanceof AMultiplicationExpression || second instanceof AModuloExpression || second instanceof ADivisionExpression){
+            s_type = "num";
+            line = 0; //too bored to calculate all if statements
+        }
+        else if(second instanceof AAsciiValExpression){
+            s_type = "str";
+            line = ((AAsciiValExpression)second).getId().getLine();
+        }
+
+        if(f_type.equals("func_call")){
+            //we need to get the type from the relative func table
+        }
+        if(s_type.equals("func_call")){
+            //we need to get the type from the relative func table
+        }
+
+        if(!f_type.equals(s_type)){
+            System.out.println("Line: " + line + " type missmatch between " + f_type + " and " + s_type);
         }
     }
 
