@@ -20,6 +20,7 @@ public class secondVisitor extends DepthFirstAdapter  {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void inAFunctionCall(AFunctionCall node){
+        boolean found_signature = false;
         String functionName = node.getId().getText();
         int line = node.getId().getLine();
         int col = node.getId().getLine();
@@ -29,37 +30,50 @@ public class secondVisitor extends DepthFirstAdapter  {
         else{
             // check if arguments are aligned with any function signature
             LinkedList argListObj = node.getArglist();
-            AArglist argListProduction = (AArglist)argListObj.getFirst();
-            
-            ArrayList args = new ArrayList<PExpression>();
-            args.add(argListProduction.getL());
-            args.addAll(argListProduction.getMultExprs());
-            int args_size = args.size();
-            List func_signatures = functionsMap.get(functionName);
-            boolean found_signature = false;
-            FunctionSignature valid_signature;
-
-            for(Object o : func_signatures){
-                FunctionSignature fs = (FunctionSignature)o;
-                int default_args = fs.getDefaultArgs();
-                int required_args = fs.getRequiredArgs();
-                if(args_size > default_args + required_args || args_size < required_args){
-                    //incorrect signature
-                    continue;
+            // Case where function has no arguments e.g. foo()
+            if(argListObj.size()==0){
+                List<FunctionSignature> signatures = functionsMap.get(functionName);
+                for(FunctionSignature fs : signatures){
+                    if(fs.getRequiredArgs()==0){
+                        found_signature = true;
+                    }
                 }
-                else{
-                    //correct signature
-                    found_signature = true;
-                    valid_signature = fs;
+                if(!found_signature){
+                    System.out.println("Line: " + line + " Column: " + col + " invalid arguments for function " + functionName);
                 }
-            }
-
-            if(!found_signature){
-                System.out.println("Line: " + line + " Column: " + col + " invalid arguments for function " + functionName);
             }
             else{
-                //register argument value types into the function's arguments
-                
+
+                AArglist argListProduction = (AArglist)argListObj.getFirst();
+                ArrayList args = new ArrayList<PExpression>();
+                args.add(argListProduction.getL());
+                args.addAll(argListProduction.getMultExprs());
+                int args_size = args.size();
+                List func_signatures = functionsMap.get(functionName);
+                FunctionSignature valid_signature;
+
+                for(Object o : func_signatures){
+                    FunctionSignature fs = (FunctionSignature)o;
+                    int default_args = fs.getDefaultArgs();
+                    int required_args = fs.getRequiredArgs();
+                    if(args_size > default_args + required_args || args_size < required_args){
+                        //incorrect signature
+                        continue;
+                    }
+                    else{
+                        //correct signature
+                        found_signature = true;
+                        valid_signature = fs;
+                    }
+                }
+
+                if(!found_signature){
+                    System.out.println("Line: " + line + " Column: " + col + " invalid arguments for function " + functionName);
+                }
+                else{
+                    //register argument value types into the function's arguments
+                    
+                }
             }
 
         }
