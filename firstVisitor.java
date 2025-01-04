@@ -256,7 +256,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         if(!f_type.equals(s_type)){
-            System.out.println("Line: " + line + " type missmatch between " + f_type + " and " + s_type);
+            System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type);
         }
     }
 

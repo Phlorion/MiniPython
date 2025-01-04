@@ -37,6 +37,7 @@ public class secondVisitor extends DepthFirstAdapter  {
             int args_size = args.size();
             List func_signatures = functionsMap.get(functionName);
             boolean found_signature = false;
+            FunctionSignature valid_signature;
 
             for(Object o : func_signatures){
                 FunctionSignature fs = (FunctionSignature)o;
@@ -49,11 +50,16 @@ public class secondVisitor extends DepthFirstAdapter  {
                 else{
                     //correct signature
                     found_signature = true;
+                    valid_signature = fs;
                 }
             }
 
             if(!found_signature){
                 System.out.println("Line: " + line + " Column: " + col + " invalid arguments for function " + functionName);
+            }
+            else{
+                //register argument value types into the function's arguments
+                
             }
 
         }
