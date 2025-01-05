@@ -3,11 +3,14 @@ import minipython.node.*;
 import java.util.*;
 
 public class firstVisitor extends DepthFirstAdapter  {
+    @SuppressWarnings("rawtypes")
     private Hashtable symtable;	
+    @SuppressWarnings("rawtypes")
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
 
-	firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
+	@SuppressWarnings("rawtypes")
+    firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
@@ -16,13 +19,32 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // assign statements
-	public void inAAssignEqStatement(AAssignEqStatement node) 
+	@SuppressWarnings({ "unchecked", "unused" })
+    public void inAAssignEqStatement(AAssignEqStatement node) 
 	{
 		String varName = node.getId().toString();
 		int line = node.getId().getLine();
         int pos = node.getId().getPos();
 		symtable.put(varName, node);
-        // System.out.println("Oristike sti grammh " + line + " h metablhth " + varName);
+
+        // keep track of each variable's value type
+        PExpression rhs = node.getExpression();
+        if (rhs instanceof AValueExpression){
+            PValue val = ((AValueExpression)rhs).getValue();
+
+            if(val instanceof ANoneValue){
+                valuetable.put(varName, "none");
+            }
+            else if (val instanceof ANumberValue){
+                valuetable.put(varName, "num");
+            }
+            else if (val instanceof ASlitValue){
+                valuetable.put(varName, "str");
+            }
+            else {
+                valuetable.put(varName, "func_call");
+            }
+        }
 	}
 
     public void inAAssignMineqStatement (AAssignMineqStatement node){
@@ -144,9 +166,11 @@ public class firstVisitor extends DepthFirstAdapter  {
     // }
 
     /**
-     * Check for 'None' in operations
+     * Check for 'None' and different value types in operations
      */
     private void inOperationExpression(PExpression first, PExpression second, String operation) {
+        String f_type = "";
+        int line = 0;
         // check left part of the operation
         if (first instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) first;
@@ -154,8 +178,38 @@ public class firstVisitor extends DepthFirstAdapter  {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
                 System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
+            else if (valueExp.getValue() instanceof ANumberValue){
+                f_type = "num";
+                line = ((ANumberValue)valueExp.getValue()).getNumber().getLine();
+            }
+            else if(valueExp.getValue() instanceof ASlitValue){
+                f_type = "str";
+                line = ((ASlitValue)valueExp.getValue()).getStringLiteral().getLine();
+            }
+            else{
+                f_type = "func_call";
+                line = ((AFuncCallValue)valueExp.getValue()).getId().getLine();
+            }
+        }
+        else if(first instanceof AFunctionCallExpression){
+            f_type = "func_call";
+            line = ((AFunctionCall)((AFunctionCallExpression)first).getFunctionCall()).getId().getLine();
+        }
+        else if(first instanceof AIdExpression){
+            f_type = (String) valuetable.get(((AIdExpression)first).getId().toString());
+            line = ((AIdExpression)first).getId().getLine();
+        }
+        else if(first instanceof ALengthExpression || first instanceof AMinExpression || first instanceof AMaxExpression || first instanceof APowerExpression ||
+        first instanceof AMultiplicationExpression || first instanceof AModuloExpression || first instanceof ADivisionExpression){
+            f_type = "num";
+            line = 0; //too bored to calculate all if statements
+        }
+        else if(first instanceof AAsciiValExpression){
+            f_type = "str";
+            line = ((AAsciiValExpression)first).getId().getLine();
         }
         
+        String s_type = "";
         // check right part of the operation
         if (second instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) second;
@@ -163,6 +217,46 @@ public class firstVisitor extends DepthFirstAdapter  {
                 TNone none = ((ANoneValue) valueExp.getValue()).getNone();
                 System.out.println("Line: " + none.getLine() + ", Cannot perform " + operation + " with keyword " + none.toString().trim());
             }
+            else if (valueExp.getValue() instanceof ANumberValue){
+                s_type = "num";
+                line = ((ANumberValue)valueExp.getValue()).getNumber().getLine();
+            }
+            else if(valueExp.getValue() instanceof ASlitValue){
+                s_type = "str";
+                line = ((ASlitValue)valueExp.getValue()).getStringLiteral().getLine();
+            }
+            else{
+                s_type = "func_call";
+                line = ((AFuncCallValue)valueExp.getValue()).getId().getLine();
+            }
+        }
+        else if(second instanceof AFunctionCallExpression){
+            s_type = "func_call";
+            line = ((AFunctionCall)((AFunctionCallExpression)second).getFunctionCall()).getId().getLine();
+        }
+        else if(second instanceof AIdExpression){
+            s_type = (String) valuetable.get(((AIdExpression)second).getId().toString());
+            line = ((AIdExpression)second).getId().getLine();
+        }
+        else if(second instanceof ALengthExpression || second instanceof AMinExpression || second instanceof AMaxExpression || second instanceof APowerExpression ||
+        second instanceof AMultiplicationExpression || second instanceof AModuloExpression || second instanceof ADivisionExpression){
+            s_type = "num";
+            line = 0; //too bored to calculate all if statements
+        }
+        else if(second instanceof AAsciiValExpression){
+            s_type = "str";
+            line = ((AAsciiValExpression)second).getId().getLine();
+        }
+
+        if(f_type.equals("func_call")){
+            //we need to get the type from the relative func table
+        }
+        if(s_type.equals("func_call")){
+            //we need to get the type from the relative func table
+        }
+
+        if(!f_type.equals(s_type)){
+            System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type);
         }
     }
 
@@ -464,10 +558,11 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // Check function definition
+    @SuppressWarnings("unchecked")
     public void inAFunction (AFunction node){
         boolean prevArgDefault = false;
         boolean errorInArgs = false;
-        boolean functionConfict = false;
+        boolean functionConflict = false;
         int requiredArgs = 0;
         int defaultArgs = 0;
         String functionName = node.getId().getText();
@@ -482,10 +577,10 @@ public class firstVisitor extends DepthFirstAdapter  {
                 for(FunctionSignature functionSignature: functionsMap.get(functionName)){
                     if(functionSignature.getRequiredArgs() == 0){ // Prosthetoume thn foo(). An uparxei hdh foo() h uparxei foo(a=1,b=1,..) error
                         System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
-                        functionConfict = true;
+                        functionConflict = true;
                     }
                 }
-                if(!functionConfict){ 
+                if(!functionConflict){ 
                     functionsMap.get(functionName).add(new FunctionSignature(0, 0));
                 }
             }
@@ -494,6 +589,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         else{                           // Periptwsh pou exei 1 toulaxiston argument
             AArguements aArguments = (AArguements) arguments.get(0);
             String firstArg = aArguments.getId().toString();
+            symtable.put(firstArg, node);
             if(aArguments.getValue().size() == 0){
                 requiredArgs = 1;
             }else{
@@ -512,6 +608,7 @@ public class firstVisitor extends DepthFirstAdapter  {
                     defaultArgs++;
                     prevArgDefault = true;
                 }
+                symtable.put(aMultArg.getId().toString(), node);
             }
             if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):
                 System.out.println("Line " + node.getId().getLine() + ": non-default argument follows default argument");
@@ -524,12 +621,12 @@ public class firstVisitor extends DepthFirstAdapter  {
                 }
                 else{
                     for(FunctionSignature functionSignature: functionsMap.get(functionName)){
-                        if(functionConfict(requiredArgs,defaultArgs,functionSignature)){
+                        if(functionConflict(requiredArgs,defaultArgs,functionSignature)){
                             System.out.println("Line " + node.getId().getLine() + ": Function " + functionName + " is already defined with the same number of arguments");
-                            functionConfict = true;
+                            functionConflict = true;
                         } 
                     }
-                    if(!functionConfict){
+                    if(!functionConflict){
                         functionsMap.get(functionName).add(new FunctionSignature(requiredArgs, defaultArgs));
                     }
                 }
@@ -542,7 +639,7 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // Basismenh sta error pou exei h ekfwnhsh
-    private boolean functionConfict(int requiredArgs, int defaultArgs, FunctionSignature fs){
+    public boolean functionConflict(int requiredArgs, int defaultArgs, FunctionSignature fs){
 
         if(defaultArgs > 0 && fs.getRequiredArgs()-requiredArgs<=defaultArgs){     //Case 1
             return true;

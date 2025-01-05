@@ -6,6 +6,7 @@ import java.util.*;
 
 public class ParserTest
 {
+  @SuppressWarnings("rawtypes")
   public static void main(String[] args)
   {
     try
@@ -14,7 +15,7 @@ public class ParserTest
         new Parser(
         new Lexer(
         new PushbackReader(
-        new FileReader("exampleFunctions.py"), 1024)));
+        new FileReader(args[0].toString()), 1024)));
 
      Hashtable symtable =  new Hashtable();
      Hashtable valuetable = new Hashtable();
