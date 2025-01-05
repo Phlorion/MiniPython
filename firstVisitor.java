@@ -198,6 +198,10 @@ public class firstVisitor extends DepthFirstAdapter  {
         else if(first instanceof AIdExpression){
             f_type = (String) valuetable.get(((AIdExpression)first).getId().toString());
             line = ((AIdExpression)first).getId().getLine();
+
+            if (f_type.equals("none")) {
+                System.out.println("Line: " + line + ", Cannot perform " + operation + " with value " + f_type.trim());
+            }
         }
         else if(first instanceof ALengthExpression || first instanceof AMinExpression || first instanceof AMaxExpression || first instanceof APowerExpression ||
         first instanceof AMultiplicationExpression || first instanceof AModuloExpression || first instanceof ADivisionExpression){
@@ -237,6 +241,10 @@ public class firstVisitor extends DepthFirstAdapter  {
         else if(second instanceof AIdExpression){
             s_type = (String) valuetable.get(((AIdExpression)second).getId().toString());
             line = ((AIdExpression)second).getId().getLine();
+
+            if (s_type.equals("none")) {
+                System.out.println("Line: " + line + ", Cannot perform " + operation + " with value " + s_type.trim());
+            }
         }
         else if(second instanceof ALengthExpression || second instanceof AMinExpression || second instanceof AMaxExpression || second instanceof APowerExpression ||
         second instanceof AMultiplicationExpression || second instanceof AModuloExpression || second instanceof ADivisionExpression){
