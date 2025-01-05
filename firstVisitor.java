@@ -542,7 +542,7 @@ public class firstVisitor extends DepthFirstAdapter  {
 
 
     // Basismenh sta error pou exei h ekfwnhsh
-    public boolean functionConfict(int requiredArgs, int defaultArgs, FunctionSignature fs){
+    private boolean functionConfict(int requiredArgs, int defaultArgs, FunctionSignature fs){
 
         if(defaultArgs > 0 && fs.getRequiredArgs()-requiredArgs<=defaultArgs){     //Case 1
             return true;
