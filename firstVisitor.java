@@ -719,9 +719,11 @@ public class firstVisitor extends DepthFirstAdapter  {
                 ArrayList temp = new ArrayList<>();
                 temp.add(exps);
                 function_calls.put(func_name, temp);
+                System.out.println("Recorded func call for func: " + func_name + exps.toString());
             }
             else{
               ((ArrayList)function_calls.get(func_name)).add(exps);
+              System.out.println("Recorded func call for func: " + func_name + exps.toString());
             }
             return;
         }
@@ -738,9 +740,11 @@ public class firstVisitor extends DepthFirstAdapter  {
             ArrayList temp = new ArrayList<>();
             temp.add(exps);
             function_calls.put(func_name, temp);
+            System.out.println("Recorded func call for func: " + func_name + exps.toString());
         }
         else{
           ((ArrayList)function_calls.get(func_name)).add(exps);
+          System.out.println("Recorded func call for func: " + func_name + exps.toString());
         }
     }
 

@@ -200,6 +200,7 @@ public class secondVisitor extends DepthFirstAdapter  {
 
             //matching call to this signature
             //assign values to all function parameters
+            System.out.println("Executing call for: " + func_name + call.toString());
             if(args.size()>0){
                 int index = 0;
                 AArguements eachArg = (AArguements)args.get(0);
@@ -259,7 +260,7 @@ public class secondVisitor extends DepthFirstAdapter  {
     }
 
     private void findTypeMissmatch(PExpression first, PExpression second, String operation, ArrayList<PExpression> call, String func_name){
-        String f_type = "f";
+        String f_type = "";
         int line = 0;
         // check left part of the operation
         if (first instanceof AValueExpression) {
@@ -299,7 +300,7 @@ public class secondVisitor extends DepthFirstAdapter  {
             line = ((AAsciiValExpression)first).getId().getLine();
         }
         
-        String s_type = "s";
+        String s_type = "";
         // check right part of the operation
         if (second instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) second;
@@ -348,7 +349,7 @@ public class secondVisitor extends DepthFirstAdapter  {
             //we need to get the type from the relative func table
         }
 
-        if(!f_type.equals(s_type)){
+        if(!f_type.equals(s_type) && !f_type.equals("") && !s_type.equals("")){
             System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type + " for call: " + func_name + call.toString());
         }
     }
