@@ -8,6 +8,7 @@ public class firstVisitor extends DepthFirstAdapter  {
     @SuppressWarnings("rawtypes")
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
+    @SuppressWarnings("rawtypes")
     private Hashtable function_calls;
 
 	@SuppressWarnings("rawtypes")

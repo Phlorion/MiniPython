@@ -8,6 +8,7 @@ public class secondVisitor extends DepthFirstAdapter  {
     @SuppressWarnings({ "unused", "rawtypes" })
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
+    @SuppressWarnings("rawtypes")
     private Hashtable function_calls;
 
 	@SuppressWarnings("rawtypes")
@@ -52,7 +53,6 @@ public class secondVisitor extends DepthFirstAdapter  {
                 args.addAll(argListProduction.getMultExprs());
                 int args_size = args.size();
                 List func_signatures = functionsMap.get(functionName);
-                FunctionSignature valid_signature;
 
                 for(Object o : func_signatures){
                     FunctionSignature fs = (FunctionSignature)o;
@@ -65,7 +65,6 @@ public class secondVisitor extends DepthFirstAdapter  {
                     else{
                         //correct signature
                         found_signature = true;
-                        valid_signature = fs;
                     }
                 }
 
