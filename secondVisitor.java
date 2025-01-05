@@ -178,9 +178,8 @@ public class secondVisitor extends DepthFirstAdapter  {
                 def_args++;
             }
             //check multiple arguments
-            System.out.println(eachArguements.getMultipleargs().toString());
             for(Object o : eachArguements.getMultipleargs()){
-                AArguements mult_arg = (AArguements)o;
+                AMultipleargs mult_arg = (AMultipleargs)o;
                 if(mult_arg.getValue().size()==0){
                     req_args++;
                 }
@@ -226,12 +225,12 @@ public class secondVisitor extends DepthFirstAdapter  {
                     valuetable.put(param, "func_call");
                 }
 
-                findTypeMissmatch(first, second, operation, call);
+                findTypeMissmatch(first, second, operation, call, func_name);
 
                 index++;
                 LinkedList mult_args = eachArg.getMultipleargs();
                 while (index < call.size()) {
-                    param = ((AArguements)mult_args.get(index-1)).getId().toString();
+                    param = ((AMultipleargs)mult_args.get(index-1)).getId().toString();
                     call_argExpression = call.get(index);
                     val = ((AValueExpression)call_argExpression).getValue();
                     if(val instanceof ANoneValue){
@@ -247,7 +246,7 @@ public class secondVisitor extends DepthFirstAdapter  {
                         valuetable.put(param, "func_call");
                     }
 
-                    findTypeMissmatch(first, second, operation, call);
+                    findTypeMissmatch(first, second, operation, call, func_name);
                     index++;
                 }
             }
@@ -259,8 +258,8 @@ public class secondVisitor extends DepthFirstAdapter  {
 
     }
 
-    private void findTypeMissmatch(PExpression first, PExpression second, String operation, ArrayList<PExpression> call){
-        String f_type = "";
+    private void findTypeMissmatch(PExpression first, PExpression second, String operation, ArrayList<PExpression> call, String func_name){
+        String f_type = "f";
         int line = 0;
         // check left part of the operation
         if (first instanceof AValueExpression) {
@@ -300,7 +299,7 @@ public class secondVisitor extends DepthFirstAdapter  {
             line = ((AAsciiValExpression)first).getId().getLine();
         }
         
-        String s_type = "";
+        String s_type = "s";
         // check right part of the operation
         if (second instanceof AValueExpression) {
             AValueExpression valueExp = (AValueExpression) second;
@@ -350,7 +349,7 @@ public class secondVisitor extends DepthFirstAdapter  {
         }
 
         if(!f_type.equals(s_type)){
-            System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type + " for call: " + call.toString());
+            System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type + " for call: " + func_name + call.toString());
         }
     }
 

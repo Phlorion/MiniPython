@@ -621,6 +621,25 @@ public class firstVisitor extends DepthFirstAdapter  {
             AArguements aArguments = (AArguements) arguments.get(0);
             String firstArg = aArguments.getId().toString();
             symtable.put(firstArg, node);
+            if(valuetable.get(firstArg)==null){
+                //assign the value type that is given as a default to the arg
+                if (aArguments.getValue().size()>0) {
+                    PValue val = (PValue)aArguments.getValue().get(0);
+                    if(val instanceof ANoneValue){
+                        valuetable.put(firstArg, "none");
+                    }
+                    else if (val instanceof ANumberValue){
+                        valuetable.put(firstArg, "num");
+                    }
+                    else if (val instanceof ASlitValue){
+                        valuetable.put(firstArg, "str");
+                    }
+                    else {
+                        valuetable.put(firstArg, "func_call");
+                    }
+                }
+                valuetable.put(firstArg, "num");
+            }
             if(aArguments.getValue().size() == 0){
                 requiredArgs = 1;
             }else{
@@ -639,7 +658,27 @@ public class firstVisitor extends DepthFirstAdapter  {
                     defaultArgs++;
                     prevArgDefault = true;
                 }
-                symtable.put(aMultArg.getId().toString(), node);
+                String aMultArgName = aMultArg.getId().toString();
+                symtable.put(aMultArgName, node);
+                if(valuetable.get(aMultArgName)==null){
+                    //assign the value type that is given as a default to the arg
+                    if (aMultArg.getValue().size()>0) {
+                        PValue val = (PValue)aMultArg.getValue().get(0);
+                        if(val instanceof ANoneValue){
+                            valuetable.put(aMultArgName, "none");
+                        }
+                        else if (val instanceof ANumberValue){
+                            valuetable.put(aMultArgName, "num");
+                        }
+                        else if (val instanceof ASlitValue){
+                            valuetable.put(aMultArgName, "str");
+                        }
+                        else {
+                            valuetable.put(aMultArgName, "func_call");
+                        }
+                    }
+                    valuetable.put(aMultArgName, "num");
+                }
             }
             if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):
                 System.out.println("Line " + node.getId().getLine() + ": non-default argument follows default argument");
