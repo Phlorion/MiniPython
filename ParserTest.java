@@ -20,12 +20,11 @@ public class ParserTest
      Hashtable symtable =  new Hashtable();
      Hashtable valuetable = new Hashtable();
      Map<String, List<FunctionSignature>> functionsMap = new HashMap<>();
+     Hashtable function_calls = new Hashtable();
      Start ast = parser.parse();
-     ast.apply(new firstVisitor(symtable,valuetable,functionsMap));
-     ast.apply(new secondVisitor(symtable, valuetable, functionsMap));
-     /* Gia ton deutero visitor grapste thn entolh
-      * ast.apply(new mysecondvisitor(symtable));
-      */
+     ast.apply(new firstVisitor(symtable,valuetable,functionsMap,function_calls));
+     ast.apply(new secondVisitor(symtable, valuetable, functionsMap,function_calls));
+     
     }
     catch (Exception e)
     {
