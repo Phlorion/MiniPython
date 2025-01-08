@@ -14,8 +14,8 @@ public class ParserTest
       Parser parser =
         new Parser(
         new Lexer(
-        new PushbackReader(
-        new FileReader(args[0].toString()), 1024)));
+        new PushbackReader(new FileReader("example4.py"))));
+        /*new FileReader(args[0].toString()), 1024))*/
 
      Hashtable symtable =  new Hashtable();
      Hashtable valuetable = new Hashtable();

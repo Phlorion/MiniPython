@@ -639,7 +639,6 @@ public class firstVisitor extends DepthFirstAdapter  {
                         valuetable.put(firstArg, "func_call");
                     }
                 }
-                valuetable.put(firstArg, "num");
             }
             if(aArguments.getValue().size() == 0){
                 requiredArgs = 1;
@@ -678,7 +677,6 @@ public class firstVisitor extends DepthFirstAdapter  {
                             valuetable.put(aMultArgName, "func_call");
                         }
                     }
-                    valuetable.put(aMultArgName, "num");
                 }
             }
             if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):

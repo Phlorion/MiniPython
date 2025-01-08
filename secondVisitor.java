@@ -211,27 +211,11 @@ public class secondVisitor extends DepthFirstAdapter  {
                 call_argExpression = call.get(index);
 
                 PValue val;
-                val = ((AValueExpression)call_argExpression).getValue();
-                if(val instanceof ANoneValue){
-                    valuetable.put(param, "none");
+                if(call_argExpression instanceof AIdExpression){
+                    //copy type of variable and use it for the param
+                    valuetable.put(param, (String)valuetable.get(((AIdExpression)call_argExpression).getId().toString()));
                 }
-                else if (val instanceof ANumberValue){
-                    valuetable.put(param, "num");
-                }
-                else if (val instanceof ASlitValue){
-                    valuetable.put(param, "str");
-                }
-                else {
-                    valuetable.put(param, "func_call");
-                }
-
-                findTypeMissmatch(first, second, operation, call, func_name);
-
-                index++;
-                LinkedList mult_args = eachArg.getMultipleargs();
-                while (index < call.size()) {
-                    param = ((AMultipleargs)mult_args.get(index-1)).getId().toString();
-                    call_argExpression = call.get(index);
+                else if (call_argExpression instanceof AValueExpression){ 
                     val = ((AValueExpression)call_argExpression).getValue();
                     if(val instanceof ANoneValue){
                         valuetable.put(param, "none");
@@ -245,17 +229,39 @@ public class secondVisitor extends DepthFirstAdapter  {
                     else {
                         valuetable.put(param, "func_call");
                     }
+                }
 
-                    findTypeMissmatch(first, second, operation, call, func_name);
+                index++;
+                LinkedList mult_args = eachArg.getMultipleargs();
+                while (index < call.size()) {
+                    param = ((AMultipleargs)mult_args.get(index-1)).getId().toString();
+                    call_argExpression = call.get(index);
+                    if(call_argExpression instanceof AIdExpression){
+                        //copy type of variable and use it for the param
+                        valuetable.put(param, (String)valuetable.get(((AIdExpression)call_argExpression).getId().toString()));
+                    }
+                    else if (call_argExpression instanceof AValueExpression){ 
+                        val = ((AValueExpression)call_argExpression).getValue();
+                        if(val instanceof ANoneValue){
+                            valuetable.put(param, "none");
+                        }
+                        else if (val instanceof ANumberValue){
+                            valuetable.put(param, "num");
+                        }
+                        else if (val instanceof ASlitValue){
+                            valuetable.put(param, "str");
+                        }
+                        else {
+                            valuetable.put(param, "func_call");
+                        }
+                    }
+                    
                     index++;
                 }
-            }
-            
+                //updating of func params is finished, check type missmatches in expression
+                findTypeMissmatch(first, second, operation, call, func_name);
+            }   
         }
-
-
-
-
     }
 
     private void findTypeMissmatch(PExpression first, PExpression second, String operation, ArrayList<PExpression> call, String func_name){
