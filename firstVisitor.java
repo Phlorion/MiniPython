@@ -8,23 +8,24 @@ public class firstVisitor extends DepthFirstAdapter  {
     @SuppressWarnings("rawtypes")
     private Hashtable valuetable;
     private Map<String, List<FunctionSignature>> functionsMap;
+    @SuppressWarnings("rawtypes")
+    private Hashtable function_calls;
 
 	@SuppressWarnings("rawtypes")
-    firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap) 
+    firstVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap, Hashtable function_calls) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
         this.functionsMap = functionsMap;
+        this.function_calls = function_calls;
 	}
 
 
     // assign statements
-	@SuppressWarnings({ "unchecked", "unused" })
+	@SuppressWarnings({ "unchecked" })
     public void inAAssignEqStatement(AAssignEqStatement node) 
 	{
 		String varName = node.getId().toString();
-		int line = node.getId().getLine();
-        int pos = node.getId().getPos();
 		symtable.put(varName, node);
 
         // keep track of each variable's value type
@@ -168,7 +169,38 @@ public class firstVisitor extends DepthFirstAdapter  {
     /**
      * Check for 'None' and different value types in operations
      */
-    private void inOperationExpression(PExpression first, PExpression second, String operation) {
+    private void inOperationExpression(PExpression first, PExpression second, String operation, Node node) {
+
+        //find out if this expression is inside a function
+        //look for the "final" parent of this node either program or function
+        Node parent_of_this = node.parent();
+        String parent_type;
+        while(true){
+            if(parent_of_this instanceof AProgramme){
+                parent_type = "program";
+                break;
+            }
+            else if (parent_of_this instanceof AFunction){
+                parent_type = "function";
+                break; 
+            }
+            parent_of_this = parent_of_this.parent();
+        }
+        
+        switch (parent_type) {
+            //if program is final parent, we arent inside a function def
+            case "program":
+                // keep checking and compare types
+                break;
+    
+            //if function is final parent, we are inside a function def
+            case "function":
+                // no need to check on first visitor
+                // skip this expression
+                return;
+        }
+
+
         String f_type = "";
         int line = 0;
         // check left part of the operation
@@ -256,6 +288,7 @@ public class firstVisitor extends DepthFirstAdapter  {
             line = ((AAsciiValExpression)second).getId().getLine();
         }
 
+
         if(f_type.equals("func_call")){
             //we need to get the type from the relative func table
         }
@@ -286,7 +319,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if adding with None keyword
-        inOperationExpression(left, right, "addition");
+        inOperationExpression(left, right, "addition", node);
     }
 
     public void inASubtractionExpression (ASubtractionExpression node){
@@ -306,7 +339,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if subtracting with None keyword
-        inOperationExpression(left, right, "subtraction");
+        inOperationExpression(left, right, "subtraction", node);
     }
 
     public void inAMultiplicationExpression (AMultiplicationExpression node){
@@ -326,7 +359,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if multiplying with None keyword
-        inOperationExpression(left, right, "multiplication");
+        inOperationExpression(left, right, "multiplication", node);
     }
 
     public void inADivisionExpression (ADivisionExpression node){
@@ -346,10 +379,9 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if dividing with None keyword
-        inOperationExpression(left, right, "division");
+        inOperationExpression(left, right, "division", node);
     }
-
-    
+   
     public void inAModuloExpression(AModuloExpression node) {
         PExpression left = node.getL();
         PExpression right = node.getR();
@@ -367,7 +399,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if modulo with None keyword
-        inOperationExpression(left, right, "modulo");
+        inOperationExpression(left, right, "modulo", node);
     }
 
     public void inAPowerExpression(APowerExpression node) {
@@ -387,7 +419,7 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
 
         // check if powering with None keyword
-        inOperationExpression(left, right, "power");
+        inOperationExpression(left, right, "power", node);
     }
 
     // list element expression
@@ -598,6 +630,24 @@ public class firstVisitor extends DepthFirstAdapter  {
             AArguements aArguments = (AArguements) arguments.get(0);
             String firstArg = aArguments.getId().toString();
             symtable.put(firstArg, node);
+            if(valuetable.get(firstArg)==null){
+                //assign the value type that is given as a default to the arg
+                if (aArguments.getValue().size()>0) {
+                    PValue val = (PValue)aArguments.getValue().get(0);
+                    if(val instanceof ANoneValue){
+                        valuetable.put(firstArg, "none");
+                    }
+                    else if (val instanceof ANumberValue){
+                        valuetable.put(firstArg, "num");
+                    }
+                    else if (val instanceof ASlitValue){
+                        valuetable.put(firstArg, "str");
+                    }
+                    else {
+                        valuetable.put(firstArg, "func_call");
+                    }
+                }
+            }
             if(aArguments.getValue().size() == 0){
                 requiredArgs = 1;
             }else{
@@ -616,7 +666,26 @@ public class firstVisitor extends DepthFirstAdapter  {
                     defaultArgs++;
                     prevArgDefault = true;
                 }
-                symtable.put(aMultArg.getId().toString(), node);
+                String aMultArgName = aMultArg.getId().toString();
+                symtable.put(aMultArgName, node);
+                if(valuetable.get(aMultArgName)==null){
+                    //assign the value type that is given as a default to the arg
+                    if (aMultArg.getValue().size()>0) {
+                        PValue val = (PValue)aMultArg.getValue().get(0);
+                        if(val instanceof ANoneValue){
+                            valuetable.put(aMultArgName, "none");
+                        }
+                        else if (val instanceof ANumberValue){
+                            valuetable.put(aMultArgName, "num");
+                        }
+                        else if (val instanceof ASlitValue){
+                            valuetable.put(aMultArgName, "str");
+                        }
+                        else {
+                            valuetable.put(aMultArgName, "func_call");
+                        }
+                    }
+                }
             }
             if(errorInArgs){  // Yparxei lathos tou tupou def foo(a=1,b):
                 System.out.println("Line " + node.getId().getLine() + ": non-default argument follows default argument");
@@ -643,6 +712,47 @@ public class firstVisitor extends DepthFirstAdapter  {
         }
         
 
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void inAFunctionCall(AFunctionCall node){
+        //record the function call to be used by the second visitor
+        String func_name = node.getId().getText();
+        ArrayList<PExpression> exps = new ArrayList<>();
+        LinkedList arglist = node.getArglist();
+
+        if(arglist.size()==0){
+            if (function_calls.get(func_name)==null){
+                ArrayList temp = new ArrayList<>();
+                temp.add(exps);
+                function_calls.put(func_name, temp);
+                System.out.println("Recorded func call for func: " + func_name + exps.toString());
+            }
+            else{
+              ((ArrayList)function_calls.get(func_name)).add(exps);
+              System.out.println("Recorded func call for func: " + func_name + exps.toString());
+            }
+            return;
+        }
+
+        AArglist trueArgList = (AArglist)arglist.get(0);
+        //add all parameter expressions
+        exps.add(trueArgList.getL());
+        for (Object object : trueArgList.getMultExprs()) {
+            exps.add((PExpression)object);
+        }
+
+        //write array of calls
+        if (function_calls.get(func_name)==null){
+            ArrayList temp = new ArrayList<>();
+            temp.add(exps);
+            function_calls.put(func_name, temp);
+            System.out.println("Recorded func call for func: " + func_name + exps.toString());
+        }
+        else{
+          ((ArrayList)function_calls.get(func_name)).add(exps);
+          System.out.println("Recorded func call for func: " + func_name + exps.toString());
+        }
     }
 
 
