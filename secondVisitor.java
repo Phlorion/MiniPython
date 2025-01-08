@@ -230,6 +230,9 @@ public class secondVisitor extends DepthFirstAdapter  {
                         valuetable.put(param, "func_call");
                     }
                 }
+                else if (call_argExpression instanceof AFunctionCallExpression){
+                    valuetable.put(param, "func_call");
+                }
 
                 index++;
                 LinkedList mult_args = eachArg.getMultipleargs();
@@ -254,6 +257,9 @@ public class secondVisitor extends DepthFirstAdapter  {
                         else {
                             valuetable.put(param, "func_call");
                         }
+                    }
+                    else if (call_argExpression instanceof AFunctionCallExpression){
+                        valuetable.put(param, "func_call");
                     }
                     
                     index++;
