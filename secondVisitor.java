@@ -10,14 +10,17 @@ public class secondVisitor extends DepthFirstAdapter  {
     private Map<String, List<FunctionSignature>> functionsMap;
     @SuppressWarnings("rawtypes")
     private Hashtable function_calls;
+    @SuppressWarnings("rawtypes")
+    private Hashtable function_returns;
 
 	@SuppressWarnings("rawtypes")
-    secondVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap, Hashtable function_calls) 
+    secondVisitor(Hashtable symtable, Hashtable valuetable,Map<String, List<FunctionSignature>> functionsMap, Hashtable function_calls, Hashtable function_returns) 
 	{
 		this.symtable = symtable;
         this.valuetable = valuetable;
         this.functionsMap = functionsMap;
         this.function_calls = function_calls;
+        this.function_returns = function_returns;
 	}
 
     
@@ -126,7 +129,7 @@ public class secondVisitor extends DepthFirstAdapter  {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void inOperationExpression(PExpression first, PExpression second, String operation, Node node) {
-         //find out if this expression is inside a function
+        //find out if this expression is inside a function
         //look for the "final" parent of this node either program or function
         Node parent_of_this = node.parent();
         String parent_type;
@@ -159,7 +162,6 @@ public class secondVisitor extends DepthFirstAdapter  {
         //find function calls related to this function
         String func_name = this_Function.getId().getText();
         ArrayList calls =(ArrayList)function_calls.get(func_name);
-
         //find function's signature
         LinkedList<PArguements> args = this_Function.getArguements();
         int req_args = 0;
@@ -363,6 +365,103 @@ public class secondVisitor extends DepthFirstAdapter  {
         if(!f_type.equals(s_type) && !f_type.equals("") && !s_type.equals("")){
             System.out.println("Line: " + line + " type missmatch for " + operation + " between " + f_type + " and " + s_type + " for call: " + func_name + call.toString());
         }
+    }
+
+    public void inAReturnStatement(AReturnStatement node) {
+        //find out if this expression is inside a function
+        //look for the "final" parent of this node either program or function
+        Node parent_of_this = node.parent();
+        String parent_type;
+        AFunction this_Function = null;
+        while(true){
+            if(parent_of_this instanceof AProgramme){
+                parent_type = "program";
+                break;
+            }
+            else if (parent_of_this instanceof AFunction){
+                parent_type = "function";
+                this_Function = (AFunction)parent_of_this;
+                break; 
+            }
+            parent_of_this = parent_of_this.parent();
+        }
+        //get all function calls
+        switch (parent_type) {
+            //if program is final parent, we arent inside a function def
+            case "program":
+                // already checked this expression on first visitor
+                return;
+    
+            //if function is final parent, we are inside a function def
+            case "function":
+                //we need to check recorded function calls
+                break;
+        }
+
+        //find function calls related to this function
+        String func_name = this_Function.getId().getText();
+        ArrayList calls =(ArrayList)function_calls.get(func_name);
+        //find function's signature
+        LinkedList<PArguements> args = this_Function.getArguements();
+        int req_args = 0;
+        int def_args = 0;
+        if(args.size()==0){
+            //0 args in func def. i.e. def foo():...
+        }
+        else{
+            AArguements eachArguements = (AArguements)args.get(0);
+            //check first argument
+            if(eachArguements.getValue().size()==0){
+                req_args++;
+            }
+            else{
+                def_args++;
+            }
+            //check multiple arguments
+            for(Object o : eachArguements.getMultipleargs()){
+                AMultipleargs mult_arg = (AMultipleargs)o;
+                if(mult_arg.getValue().size()==0){
+                    req_args++;
+                }
+                else{
+                    def_args++;
+                }
+            }
+        }
+        
+
+        // store the return types of each function call
+        ArrayList<Map<String, Object>> tempFunc__CallMaps = new ArrayList<>(); // store the function calls in a queue of Maps, where <Key, Value> = <func_name, call>
+
+        for (Object call : calls) {
+            if (((ArrayList)call).size() >= req_args && ((ArrayList)call).size() <= req_args + def_args) { // if signature of current function matches siganture of called function
+                Map<String, Object> function__call_pair = new HashMap<>();
+                function__call_pair.put(func_name, call);
+                tempFunc__CallMaps.add(function__call_pair);
+            }
+        }
+
+        // check return statement
+        PExpression _return = node.getExpression();
+
+        for (Map<String, Object> pair : tempFunc__CallMaps) {
+            // for (Map.Entry<String, Object> set : pair.entrySet()) {
+            //     System.out.println(set.getKey() + " " + set.getValue());
+            // }
+            if (_return instanceof AValueExpression) {
+                AValueExpression _return_value = (AValueExpression) _return;
+                //System.out.println(_return_value.getValue().getClass().getName());
+                function_returns.put(pair, _return_value.getClass().getName());
+            }
+        }
+
+        Enumeration<HashMap> e = function_returns.keys();
+ 
+        while (e.hasMoreElements()) {
+            HashMap key = e.nextElement();
+            System.out.println(func_name + " " + req_args + " " + def_args + " Rank : " + key + " Name : " + function_returns.get(key));
+        }
+        System.out.println();
     }
 
 }
