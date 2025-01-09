@@ -367,6 +367,7 @@ public class secondVisitor extends DepthFirstAdapter  {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void inAReturnStatement(AReturnStatement node) {
         //find out if this expression is inside a function
         //look for the "final" parent of this node either program or function
@@ -428,6 +429,85 @@ public class secondVisitor extends DepthFirstAdapter  {
                 }
             }
         }
+
+        //find calls related to this function's signature
+        for(Object o : calls){
+            ArrayList<PExpression> call = (ArrayList)o;
+            int call_size = call.size();
+            if(call_size < req_args || call_size > req_args + def_args){
+                //not matching call to this signature
+                continue;
+            }
+
+            //matching call to this signature
+            //assign values to all function parameters
+            System.out.println("Executing call for: " + func_name + call.toString());
+            if(args.size()>0){
+                int index = 0;
+                AArguements eachArg = (AArguements)args.get(0);
+
+                String param;
+                param = eachArg.getId().toString();
+
+                PExpression call_argExpression;
+                call_argExpression = call.get(index);
+
+                PValue val;
+                if(call_argExpression instanceof AIdExpression){
+                    //copy type of variable and use it for the param
+                    valuetable.put(param, (String)valuetable.get(((AIdExpression)call_argExpression).getId().toString()));
+                }
+                else if (call_argExpression instanceof AValueExpression){ 
+                    val = ((AValueExpression)call_argExpression).getValue();
+                    if(val instanceof ANoneValue){
+                        valuetable.put(param, "none");
+                    }
+                    else if (val instanceof ANumberValue){
+                        valuetable.put(param, "num");
+                    }
+                    else if (val instanceof ASlitValue){
+                        valuetable.put(param, "str");
+                    }
+                    else {
+                        valuetable.put(param, "func_call");
+                    }
+                }
+                else if (call_argExpression instanceof AFunctionCallExpression){
+                    valuetable.put(param, "func_call");
+                }
+
+                index++;
+                LinkedList mult_args = eachArg.getMultipleargs();
+                while (index < call.size()) {
+                    param = ((AMultipleargs)mult_args.get(index-1)).getId().toString();
+                    call_argExpression = call.get(index);
+                    if(call_argExpression instanceof AIdExpression){
+                        //copy type of variable and use it for the param
+                        valuetable.put(param, (String)valuetable.get(((AIdExpression)call_argExpression).getId().toString()));
+                    }
+                    else if (call_argExpression instanceof AValueExpression){ 
+                        val = ((AValueExpression)call_argExpression).getValue();
+                        if(val instanceof ANoneValue){
+                            valuetable.put(param, "none");
+                        }
+                        else if (val instanceof ANumberValue){
+                            valuetable.put(param, "num");
+                        }
+                        else if (val instanceof ASlitValue){
+                            valuetable.put(param, "str");
+                        }
+                        else {
+                            valuetable.put(param, "func_call");
+                        }
+                    }
+                    else if (call_argExpression instanceof AFunctionCallExpression){
+                        valuetable.put(param, "func_call");
+                    }
+                    
+                    index++;
+                }
+            }   
+        }
         
 
         // store the return types of each function call
@@ -451,17 +531,43 @@ public class secondVisitor extends DepthFirstAdapter  {
             if (_return instanceof AValueExpression) {
                 AValueExpression _return_value = (AValueExpression) _return;
                 //System.out.println(_return_value.getValue().getClass().getName());
-                function_returns.put(pair, _return_value.getClass().getName());
+                function_returns.put(pair, _return_value.getValue().getClass().getName());
+            }
+            else if (_return instanceof AIdExpression) {
+                AIdExpression _return_id = (AIdExpression) _return;
+                String _return_id_value = (String) valuetable.get(_return_id.getId().toString());
+                
+                // get all cases of what the parameters can be
+                if(_return_id_value.equals("none")){
+                    function_returns.put(pair, ANoneValue.class.getName());
+                }
+                else if (_return_id_value.equals("num")){
+                    function_returns.put(pair, ANumberValue.class.getName());
+                }
+                else if (_return_id_value.equals("str")){
+                    function_returns.put(pair, ASlitValue.class.getName());
+                }
+                else {
+                    function_returns.put(pair, AFuncCallValue.class.getName());
+                }
+            }
+            else if(_return instanceof ALengthExpression || _return instanceof AMinExpression || _return instanceof AMaxExpression || _return instanceof APowerExpression ||
+            _return instanceof AMultiplicationExpression || _return instanceof AModuloExpression || _return instanceof ADivisionExpression || _return instanceof AAdditionExpression || _return instanceof ASubtractionExpression) {
+                function_returns.put(pair, ANumberValue.class.getName());
+            }
+            else if(_return instanceof AAsciiValExpression){
+                function_returns.put(pair, ASlitValue.class.getName());
             }
         }
 
-        Enumeration<HashMap> e = function_returns.keys();
+        
+        // Enumeration<HashMap> e = function_returns.keys();
  
-        while (e.hasMoreElements()) {
-            HashMap key = e.nextElement();
-            System.out.println(func_name + " " + req_args + " " + def_args + " Rank : " + key + " Name : " + function_returns.get(key));
-        }
-        System.out.println();
+        // while (e.hasMoreElements()) {
+        //     HashMap key = e.nextElement();
+        //     System.out.println(func_name + " " + req_args + " " + def_args + " Rank : " + key + " Name : " + function_returns.get(key));
+        // }
+        // System.out.println();
+        
     }
-
 }

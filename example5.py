@@ -27,9 +27,3 @@ def noneWithIds():
     b = None
 
     return a + 3 * b
-
-def returnNone():
-    return None
-
-def noneWithFuncs():
-    return returnNone() + 5 ** returnNone() % returnNone()
