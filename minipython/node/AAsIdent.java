@@ -7,7 +7,6 @@ import minipython.analysis.*;
 
 public final class AAsIdent extends PAsIdent
 {
-    private TAs _as_;
     private TId _id_;
 
     public AAsIdent()
@@ -15,49 +14,20 @@ public final class AAsIdent extends PAsIdent
     }
 
     public AAsIdent(
-        TAs _as_,
         TId _id_)
     {
-        setAs(_as_);
-
         setId(_id_);
 
     }
     public Object clone()
     {
         return new AAsIdent(
-            (TAs) cloneNode(_as_),
             (TId) cloneNode(_id_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAAsIdent(this);
-    }
-
-    public TAs getAs()
-    {
-        return _as_;
-    }
-
-    public void setAs(TAs node)
-    {
-        if(_as_ != null)
-        {
-            _as_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _as_ = node;
     }
 
     public TId getId()
@@ -88,18 +58,11 @@ public final class AAsIdent extends PAsIdent
     public String toString()
     {
         return ""
-            + toString(_as_)
             + toString(_id_);
     }
 
     void removeChild(Node child)
     {
-        if(_as_ == child)
-        {
-            _as_ = null;
-            return;
-        }
-
         if(_id_ == child)
         {
             _id_ = null;
@@ -110,12 +73,6 @@ public final class AAsIdent extends PAsIdent
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_as_ == oldChild)
-        {
-            setAs((TAs) newChild);
-            return;
-        }
-
         if(_id_ == oldChild)
         {
             setId((TId) newChild);

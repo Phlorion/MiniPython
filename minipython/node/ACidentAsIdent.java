@@ -7,62 +7,35 @@ import minipython.analysis.*;
 
 public final class ACidentAsIdent extends PCidentAsIdent
 {
-    private TComma _comma_;
     private TId _id_;
-    private PAsIdent _asIdent_;
+    private final LinkedList _asIdent_ = new TypedLinkedList(new AsIdent_Cast());
 
     public ACidentAsIdent()
     {
     }
 
     public ACidentAsIdent(
-        TComma _comma_,
         TId _id_,
-        PAsIdent _asIdent_)
+        List _asIdent_)
     {
-        setComma(_comma_);
-
         setId(_id_);
 
-        setAsIdent(_asIdent_);
+        {
+            this._asIdent_.clear();
+            this._asIdent_.addAll(_asIdent_);
+        }
 
     }
     public Object clone()
     {
         return new ACidentAsIdent(
-            (TComma) cloneNode(_comma_),
             (TId) cloneNode(_id_),
-            (PAsIdent) cloneNode(_asIdent_));
+            cloneList(_asIdent_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseACidentAsIdent(this);
-    }
-
-    public TComma getComma()
-    {
-        return _comma_;
-    }
-
-    public void setComma(TComma node)
-    {
-        if(_comma_ != null)
-        {
-            _comma_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _comma_ = node;
     }
 
     public TId getId()
@@ -90,56 +63,34 @@ public final class ACidentAsIdent extends PCidentAsIdent
         _id_ = node;
     }
 
-    public PAsIdent getAsIdent()
+    public LinkedList getAsIdent()
     {
         return _asIdent_;
     }
 
-    public void setAsIdent(PAsIdent node)
+    public void setAsIdent(List list)
     {
-        if(_asIdent_ != null)
-        {
-            _asIdent_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _asIdent_ = node;
+        _asIdent_.clear();
+        _asIdent_.addAll(list);
     }
 
     public String toString()
     {
         return ""
-            + toString(_comma_)
             + toString(_id_)
             + toString(_asIdent_);
     }
 
     void removeChild(Node child)
     {
-        if(_comma_ == child)
-        {
-            _comma_ = null;
-            return;
-        }
-
         if(_id_ == child)
         {
             _id_ = null;
             return;
         }
 
-        if(_asIdent_ == child)
+        if(_asIdent_.remove(child))
         {
-            _asIdent_ = null;
             return;
         }
 
@@ -147,23 +98,50 @@ public final class ACidentAsIdent extends PCidentAsIdent
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_comma_ == oldChild)
-        {
-            setComma((TComma) newChild);
-            return;
-        }
-
         if(_id_ == oldChild)
         {
             setId((TId) newChild);
             return;
         }
 
-        if(_asIdent_ == oldChild)
+        for(ListIterator i = _asIdent_.listIterator(); i.hasNext();)
         {
-            setAsIdent((PAsIdent) newChild);
-            return;
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set(newChild);
+                    oldChild.parent(null);
+                    return;
+                }
+
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
+    }
+
+    private class AsIdent_Cast implements Cast
+    {
+        public Object cast(Object o)
+        {
+            PAsIdent node = (PAsIdent) o;
+
+            if((node.parent() != null) &&
+                (node.parent() != ACidentAsIdent.this))
+            {
+                node.parent().removeChild(node);
+            }
+
+            if((node.parent() == null) ||
+                (node.parent() != ACidentAsIdent.this))
+            {
+                node.parent(ACidentAsIdent.this);
+            }
+
+            return node;
+        }
     }
 }

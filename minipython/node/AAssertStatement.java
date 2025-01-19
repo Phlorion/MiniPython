@@ -7,40 +7,30 @@ import minipython.analysis.*;
 
 public final class AAssertStatement extends PStatement
 {
-    private final LinkedList _tab_ = new TypedLinkedList(new Tab_Cast());
-    private TAssert _assert_;
-    private PExpression _expression_;
-    private PCommaExpression _commaExpression_;
+    private PExpression _l_;
+    private final LinkedList _commaExp_ = new TypedLinkedList(new CommaExp_Cast());
 
     public AAssertStatement()
     {
     }
 
     public AAssertStatement(
-        List _tab_,
-        TAssert _assert_,
-        PExpression _expression_,
-        PCommaExpression _commaExpression_)
+        PExpression _l_,
+        List _commaExp_)
     {
+        setL(_l_);
+
         {
-            this._tab_.clear();
-            this._tab_.addAll(_tab_);
+            this._commaExp_.clear();
+            this._commaExp_.addAll(_commaExp_);
         }
-
-        setAssert(_assert_);
-
-        setExpression(_expression_);
-
-        setCommaExpression(_commaExpression_);
 
     }
     public Object clone()
     {
         return new AAssertStatement(
-            cloneList(_tab_),
-            (TAssert) cloneNode(_assert_),
-            (PExpression) cloneNode(_expression_),
-            (PCommaExpression) cloneNode(_commaExpression_));
+            (PExpression) cloneNode(_l_),
+            cloneList(_commaExp_));
     }
 
     public void apply(Switch sw)
@@ -48,27 +38,16 @@ public final class AAssertStatement extends PStatement
         ((Analysis) sw).caseAAssertStatement(this);
     }
 
-    public LinkedList getTab()
+    public PExpression getL()
     {
-        return _tab_;
+        return _l_;
     }
 
-    public void setTab(List list)
+    public void setL(PExpression node)
     {
-        _tab_.clear();
-        _tab_.addAll(list);
-    }
-
-    public TAssert getAssert()
-    {
-        return _assert_;
-    }
-
-    public void setAssert(TAssert node)
-    {
-        if(_assert_ != null)
+        if(_l_ != null)
         {
-            _assert_.parent(null);
+            _l_.parent(null);
         }
 
         if(node != null)
@@ -81,90 +60,37 @@ public final class AAssertStatement extends PStatement
             node.parent(this);
         }
 
-        _assert_ = node;
+        _l_ = node;
     }
 
-    public PExpression getExpression()
+    public LinkedList getCommaExp()
     {
-        return _expression_;
+        return _commaExp_;
     }
 
-    public void setExpression(PExpression node)
+    public void setCommaExp(List list)
     {
-        if(_expression_ != null)
-        {
-            _expression_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _expression_ = node;
-    }
-
-    public PCommaExpression getCommaExpression()
-    {
-        return _commaExpression_;
-    }
-
-    public void setCommaExpression(PCommaExpression node)
-    {
-        if(_commaExpression_ != null)
-        {
-            _commaExpression_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _commaExpression_ = node;
+        _commaExp_.clear();
+        _commaExp_.addAll(list);
     }
 
     public String toString()
     {
         return ""
-            + toString(_tab_)
-            + toString(_assert_)
-            + toString(_expression_)
-            + toString(_commaExpression_);
+            + toString(_l_)
+            + toString(_commaExp_);
     }
 
     void removeChild(Node child)
     {
-        if(_tab_.remove(child))
+        if(_l_ == child)
         {
+            _l_ = null;
             return;
         }
 
-        if(_assert_ == child)
+        if(_commaExp_.remove(child))
         {
-            _assert_ = null;
-            return;
-        }
-
-        if(_expression_ == child)
-        {
-            _expression_ = null;
-            return;
-        }
-
-        if(_commaExpression_ == child)
-        {
-            _commaExpression_ = null;
             return;
         }
 
@@ -172,7 +98,13 @@ public final class AAssertStatement extends PStatement
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        for(ListIterator i = _tab_.listIterator(); i.hasNext();)
+        if(_l_ == oldChild)
+        {
+            setL((PExpression) newChild);
+            return;
+        }
+
+        for(ListIterator i = _commaExp_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
@@ -189,31 +121,13 @@ public final class AAssertStatement extends PStatement
             }
         }
 
-        if(_assert_ == oldChild)
-        {
-            setAssert((TAssert) newChild);
-            return;
-        }
-
-        if(_expression_ == oldChild)
-        {
-            setExpression((PExpression) newChild);
-            return;
-        }
-
-        if(_commaExpression_ == oldChild)
-        {
-            setCommaExpression((PCommaExpression) newChild);
-            return;
-        }
-
     }
 
-    private class Tab_Cast implements Cast
+    private class CommaExp_Cast implements Cast
     {
         public Object cast(Object o)
         {
-            TTab node = (TTab) o;
+            PExpression node = (PExpression) o;
 
             if((node.parent() != null) &&
                 (node.parent() != AAssertStatement.this))

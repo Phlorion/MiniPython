@@ -8,26 +8,21 @@ import minipython.analysis.*;
 public final class AIdentDot extends PIdentDot
 {
     private TId _id_;
-    private TDot _dot_;
 
     public AIdentDot()
     {
     }
 
     public AIdentDot(
-        TId _id_,
-        TDot _dot_)
+        TId _id_)
     {
         setId(_id_);
-
-        setDot(_dot_);
 
     }
     public Object clone()
     {
         return new AIdentDot(
-            (TId) cloneNode(_id_),
-            (TDot) cloneNode(_dot_));
+            (TId) cloneNode(_id_));
     }
 
     public void apply(Switch sw)
@@ -60,36 +55,10 @@ public final class AIdentDot extends PIdentDot
         _id_ = node;
     }
 
-    public TDot getDot()
-    {
-        return _dot_;
-    }
-
-    public void setDot(TDot node)
-    {
-        if(_dot_ != null)
-        {
-            _dot_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _dot_ = node;
-    }
-
     public String toString()
     {
         return ""
-            + toString(_id_)
-            + toString(_dot_);
+            + toString(_id_);
     }
 
     void removeChild(Node child)
@@ -100,12 +69,6 @@ public final class AIdentDot extends PIdentDot
             return;
         }
 
-        if(_dot_ == child)
-        {
-            _dot_ = null;
-            return;
-        }
-
     }
 
     void replaceChild(Node oldChild, Node newChild)
@@ -113,12 +76,6 @@ public final class AIdentDot extends PIdentDot
         if(_id_ == oldChild)
         {
             setId((TId) newChild);
-            return;
-        }
-
-        if(_dot_ == oldChild)
-        {
-            setDot((TDot) newChild);
             return;
         }
 

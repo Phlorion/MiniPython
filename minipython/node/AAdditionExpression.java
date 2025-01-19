@@ -7,22 +7,27 @@ import minipython.analysis.*;
 
 public final class AAdditionExpression extends PExpression
 {
-    private PAddition _addition_;
+    private PExpression _l_;
+    private PExpression _r_;
 
     public AAdditionExpression()
     {
     }
 
     public AAdditionExpression(
-        PAddition _addition_)
+        PExpression _l_,
+        PExpression _r_)
     {
-        setAddition(_addition_);
+        setL(_l_);
+
+        setR(_r_);
 
     }
     public Object clone()
     {
         return new AAdditionExpression(
-            (PAddition) cloneNode(_addition_));
+            (PExpression) cloneNode(_l_),
+            (PExpression) cloneNode(_r_));
     }
 
     public void apply(Switch sw)
@@ -30,16 +35,16 @@ public final class AAdditionExpression extends PExpression
         ((Analysis) sw).caseAAdditionExpression(this);
     }
 
-    public PAddition getAddition()
+    public PExpression getL()
     {
-        return _addition_;
+        return _l_;
     }
 
-    public void setAddition(PAddition node)
+    public void setL(PExpression node)
     {
-        if(_addition_ != null)
+        if(_l_ != null)
         {
-            _addition_.parent(null);
+            _l_.parent(null);
         }
 
         if(node != null)
@@ -52,20 +57,52 @@ public final class AAdditionExpression extends PExpression
             node.parent(this);
         }
 
-        _addition_ = node;
+        _l_ = node;
+    }
+
+    public PExpression getR()
+    {
+        return _r_;
+    }
+
+    public void setR(PExpression node)
+    {
+        if(_r_ != null)
+        {
+            _r_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        _r_ = node;
     }
 
     public String toString()
     {
         return ""
-            + toString(_addition_);
+            + toString(_l_)
+            + toString(_r_);
     }
 
     void removeChild(Node child)
     {
-        if(_addition_ == child)
+        if(_l_ == child)
         {
-            _addition_ = null;
+            _l_ = null;
+            return;
+        }
+
+        if(_r_ == child)
+        {
+            _r_ = null;
             return;
         }
 
@@ -73,9 +110,15 @@ public final class AAdditionExpression extends PExpression
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_addition_ == oldChild)
+        if(_l_ == oldChild)
         {
-            setAddition((PAddition) newChild);
+            setL((PExpression) newChild);
+            return;
+        }
+
+        if(_r_ == oldChild)
+        {
+            setR((PExpression) newChild);
             return;
         }
 

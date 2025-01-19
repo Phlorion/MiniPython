@@ -7,30 +7,30 @@ import minipython.analysis.*;
 
 public final class AArglist extends PArglist
 {
-    private PExpression _expression_;
-    private final LinkedList _commaExpression_ = new TypedLinkedList(new CommaExpression_Cast());
+    private PExpression _l_;
+    private final LinkedList _multExprs_ = new TypedLinkedList(new MultExprs_Cast());
 
     public AArglist()
     {
     }
 
     public AArglist(
-        PExpression _expression_,
-        List _commaExpression_)
+        PExpression _l_,
+        List _multExprs_)
     {
-        setExpression(_expression_);
+        setL(_l_);
 
         {
-            this._commaExpression_.clear();
-            this._commaExpression_.addAll(_commaExpression_);
+            this._multExprs_.clear();
+            this._multExprs_.addAll(_multExprs_);
         }
 
     }
     public Object clone()
     {
         return new AArglist(
-            (PExpression) cloneNode(_expression_),
-            cloneList(_commaExpression_));
+            (PExpression) cloneNode(_l_),
+            cloneList(_multExprs_));
     }
 
     public void apply(Switch sw)
@@ -38,16 +38,16 @@ public final class AArglist extends PArglist
         ((Analysis) sw).caseAArglist(this);
     }
 
-    public PExpression getExpression()
+    public PExpression getL()
     {
-        return _expression_;
+        return _l_;
     }
 
-    public void setExpression(PExpression node)
+    public void setL(PExpression node)
     {
-        if(_expression_ != null)
+        if(_l_ != null)
         {
-            _expression_.parent(null);
+            _l_.parent(null);
         }
 
         if(node != null)
@@ -60,36 +60,36 @@ public final class AArglist extends PArglist
             node.parent(this);
         }
 
-        _expression_ = node;
+        _l_ = node;
     }
 
-    public LinkedList getCommaExpression()
+    public LinkedList getMultExprs()
     {
-        return _commaExpression_;
+        return _multExprs_;
     }
 
-    public void setCommaExpression(List list)
+    public void setMultExprs(List list)
     {
-        _commaExpression_.clear();
-        _commaExpression_.addAll(list);
+        _multExprs_.clear();
+        _multExprs_.addAll(list);
     }
 
     public String toString()
     {
         return ""
-            + toString(_expression_)
-            + toString(_commaExpression_);
+            + toString(_l_)
+            + toString(_multExprs_);
     }
 
     void removeChild(Node child)
     {
-        if(_expression_ == child)
+        if(_l_ == child)
         {
-            _expression_ = null;
+            _l_ = null;
             return;
         }
 
-        if(_commaExpression_.remove(child))
+        if(_multExprs_.remove(child))
         {
             return;
         }
@@ -98,13 +98,13 @@ public final class AArglist extends PArglist
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_expression_ == oldChild)
+        if(_l_ == oldChild)
         {
-            setExpression((PExpression) newChild);
+            setL((PExpression) newChild);
             return;
         }
 
-        for(ListIterator i = _commaExpression_.listIterator(); i.hasNext();)
+        for(ListIterator i = _multExprs_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
@@ -123,11 +123,11 @@ public final class AArglist extends PArglist
 
     }
 
-    private class CommaExpression_Cast implements Cast
+    private class MultExprs_Cast implements Cast
     {
         public Object cast(Object o)
         {
-            PCommaExpression node = (PCommaExpression) o;
+            PExpression node = (PExpression) o;
 
             if((node.parent() != null) &&
                 (node.parent() != AArglist.this))

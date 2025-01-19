@@ -78,7 +78,7 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseAExprCommands(AExprCommands node)
+    public void caseAFuncCommands(AFuncCommands node)
     {
         defaultCase(node);
     }
@@ -108,7 +108,17 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseAAssignopStatement(AAssignopStatement node)
+    public void caseAAssignEqStatement(AAssignEqStatement node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAAssignMineqStatement(AAssignMineqStatement node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAAssignDiveqStatement(AAssignDiveqStatement node)
     {
         defaultCase(node);
     }
@@ -133,26 +143,6 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseACommaExpression(ACommaExpression node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAEqAssignop(AEqAssignop node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMineqAssignop(AMineqAssignop node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseADiveqAssignop(ADiveqAssignop node)
-    {
-        defaultCase(node);
-    }
-
     public void caseAFunction(AFunction node)
     {
         defaultCase(node);
@@ -168,12 +158,32 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseAAssignval(AAssignval node)
+    public void caseAAdditionExpression(AAdditionExpression node)
     {
         defaultCase(node);
     }
 
-    public void caseAAdditionExpression(AAdditionExpression node)
+    public void caseASubtractionExpression(ASubtractionExpression node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAMultiplicationExpression(AMultiplicationExpression node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseADivisionExpression(ADivisionExpression node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAModuloExpression(AModuloExpression node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAPowerExpression(APowerExpression node)
     {
         defaultCase(node);
     }
@@ -183,7 +193,7 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseAFuntionCallExpression(AFuntionCallExpression node)
+    public void caseAFunctionCallExpression(AFunctionCallExpression node)
     {
         defaultCase(node);
     }
@@ -208,7 +218,12 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseAMinMaxExpression(AMinMaxExpression node)
+    public void caseAMinExpression(AMinExpression node)
+    {
+        defaultCase(node);
+    }
+
+    public void caseAMaxExpression(AMaxExpression node)
     {
         defaultCase(node);
     }
@@ -219,76 +234,6 @@ public class AnalysisAdapter implements Analysis
     }
 
     public void caseAListExpression(AListExpression node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMultiplicationAddition(AMultiplicationAddition node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAAdditionAddition(AAdditionAddition node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseASubtractionAddition(ASubtractionAddition node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMultiplicationMultiplication(AMultiplicationMultiplication node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseADivisionMultiplication(ADivisionMultiplication node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAModuloMultiplication(AModuloMultiplication node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAPowerMultiplication(APowerMultiplication node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAPowerPower(APowerPower node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAFactorPower(AFactorPower node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseANumberFactor(ANumberFactor node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAExpressionFactor(AExpressionFactor node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMinMinMax(AMinMinMax node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMaxMinMax(AMaxMinMax node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAMultipleValues(AMultipleValues node)
     {
         defaultCase(node);
     }
@@ -328,72 +273,57 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseACompAndComparisonOr(ACompAndComparisonOr node)
+    public void caseAOrComparisons(AOrComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAOrComparisonOr(AOrComparisonOr node)
+    public void caseAAndComparisons(AAndComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseACompNotComparisonAnd(ACompNotComparisonAnd node)
+    public void caseANotComparisons(ANotComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAAndComparisonAnd(AAndComparisonAnd node)
+    public void caseAGreatComparisons(AGreatComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAComparisonComparisonNot(AComparisonComparisonNot node)
+    public void caseALessComparisons(ALessComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAComparisonNot(AComparisonNot node)
+    public void caseAGreatEqComparisons(AGreatEqComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAGreatComparison(AGreatComparison node)
+    public void caseALessEqComparisons(ALessEqComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseALessComparison(ALessComparison node)
+    public void caseANotEqComparisons(ANotEqComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseAGreatEqComparison(AGreatEqComparison node)
+    public void caseACompEqComparisons(ACompEqComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseALessEqComparison(ALessEqComparison node)
+    public void caseATrueComparisons(ATrueComparisons node)
     {
         defaultCase(node);
     }
 
-    public void caseANotEqComparison(ANotEqComparison node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseACompEqComparison(ACompEqComparison node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseATrueComparison(ATrueComparison node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseAFalseComparison(AFalseComparison node)
+    public void caseAFalseComparisons(AFalseComparisons node)
     {
         defaultCase(node);
     }
@@ -418,12 +348,7 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseADoubleQuoteStringValue(ADoubleQuoteStringValue node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseASingleQuoteStringValue(ASingleQuoteStringValue node)
+    public void caseASlitValue(ASlitValue node)
     {
         defaultCase(node);
     }
@@ -683,12 +608,7 @@ public class AnalysisAdapter implements Analysis
         defaultCase(node);
     }
 
-    public void caseTStringSingleQuote(TStringSingleQuote node)
-    {
-        defaultCase(node);
-    }
-
-    public void caseTStringDoubleQuote(TStringDoubleQuote node)
+    public void caseTStringLiteral(TStringLiteral node)
     {
         defaultCase(node);
     }

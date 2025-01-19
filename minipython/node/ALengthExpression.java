@@ -7,92 +7,27 @@ import minipython.analysis.*;
 
 public final class ALengthExpression extends PExpression
 {
-    private TLen _len_;
-    private TLPar _lPar_;
     private PExpression _expression_;
-    private TRPar _rPar_;
 
     public ALengthExpression()
     {
     }
 
     public ALengthExpression(
-        TLen _len_,
-        TLPar _lPar_,
-        PExpression _expression_,
-        TRPar _rPar_)
+        PExpression _expression_)
     {
-        setLen(_len_);
-
-        setLPar(_lPar_);
-
         setExpression(_expression_);
-
-        setRPar(_rPar_);
 
     }
     public Object clone()
     {
         return new ALengthExpression(
-            (TLen) cloneNode(_len_),
-            (TLPar) cloneNode(_lPar_),
-            (PExpression) cloneNode(_expression_),
-            (TRPar) cloneNode(_rPar_));
+            (PExpression) cloneNode(_expression_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseALengthExpression(this);
-    }
-
-    public TLen getLen()
-    {
-        return _len_;
-    }
-
-    public void setLen(TLen node)
-    {
-        if(_len_ != null)
-        {
-            _len_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _len_ = node;
-    }
-
-    public TLPar getLPar()
-    {
-        return _lPar_;
-    }
-
-    public void setLPar(TLPar node)
-    {
-        if(_lPar_ != null)
-        {
-            _lPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lPar_ = node;
     }
 
     public PExpression getExpression()
@@ -120,63 +55,17 @@ public final class ALengthExpression extends PExpression
         _expression_ = node;
     }
 
-    public TRPar getRPar()
-    {
-        return _rPar_;
-    }
-
-    public void setRPar(TRPar node)
-    {
-        if(_rPar_ != null)
-        {
-            _rPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rPar_ = node;
-    }
-
     public String toString()
     {
         return ""
-            + toString(_len_)
-            + toString(_lPar_)
-            + toString(_expression_)
-            + toString(_rPar_);
+            + toString(_expression_);
     }
 
     void removeChild(Node child)
     {
-        if(_len_ == child)
-        {
-            _len_ = null;
-            return;
-        }
-
-        if(_lPar_ == child)
-        {
-            _lPar_ = null;
-            return;
-        }
-
         if(_expression_ == child)
         {
             _expression_ = null;
-            return;
-        }
-
-        if(_rPar_ == child)
-        {
-            _rPar_ = null;
             return;
         }
 
@@ -184,27 +73,9 @@ public final class ALengthExpression extends PExpression
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_len_ == oldChild)
-        {
-            setLen((TLen) newChild);
-            return;
-        }
-
-        if(_lPar_ == oldChild)
-        {
-            setLPar((TLPar) newChild);
-            return;
-        }
-
         if(_expression_ == oldChild)
         {
             setExpression((PExpression) newChild);
-            return;
-        }
-
-        if(_rPar_ == oldChild)
-        {
-            setRPar((TRPar) newChild);
             return;
         }
 

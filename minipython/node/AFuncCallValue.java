@@ -8,7 +8,6 @@ import minipython.analysis.*;
 public final class AFuncCallValue extends PValue
 {
     private TId _id_;
-    private TDot _dot_;
     private PFunctionCall _functionCall_;
 
     public AFuncCallValue()
@@ -17,12 +16,9 @@ public final class AFuncCallValue extends PValue
 
     public AFuncCallValue(
         TId _id_,
-        TDot _dot_,
         PFunctionCall _functionCall_)
     {
         setId(_id_);
-
-        setDot(_dot_);
 
         setFunctionCall(_functionCall_);
 
@@ -31,7 +27,6 @@ public final class AFuncCallValue extends PValue
     {
         return new AFuncCallValue(
             (TId) cloneNode(_id_),
-            (TDot) cloneNode(_dot_),
             (PFunctionCall) cloneNode(_functionCall_));
     }
 
@@ -65,31 +60,6 @@ public final class AFuncCallValue extends PValue
         _id_ = node;
     }
 
-    public TDot getDot()
-    {
-        return _dot_;
-    }
-
-    public void setDot(TDot node)
-    {
-        if(_dot_ != null)
-        {
-            _dot_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _dot_ = node;
-    }
-
     public PFunctionCall getFunctionCall()
     {
         return _functionCall_;
@@ -119,7 +89,6 @@ public final class AFuncCallValue extends PValue
     {
         return ""
             + toString(_id_)
-            + toString(_dot_)
             + toString(_functionCall_);
     }
 
@@ -128,12 +97,6 @@ public final class AFuncCallValue extends PValue
         if(_id_ == child)
         {
             _id_ = null;
-            return;
-        }
-
-        if(_dot_ == child)
-        {
-            _dot_ = null;
             return;
         }
 
@@ -150,12 +113,6 @@ public final class AFuncCallValue extends PValue
         if(_id_ == oldChild)
         {
             setId((TId) newChild);
-            return;
-        }
-
-        if(_dot_ == oldChild)
-        {
-            setDot((TDot) newChild);
             return;
         }
 

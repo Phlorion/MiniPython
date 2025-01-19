@@ -7,37 +7,22 @@ import minipython.analysis.*;
 
 public final class AAsciiValExpression extends PExpression
 {
-    private TAscii _ascii_;
-    private TLPar _lPar_;
-    private PExpression _expression_;
-    private TRPar _rPar_;
+    private TId _id_;
 
     public AAsciiValExpression()
     {
     }
 
     public AAsciiValExpression(
-        TAscii _ascii_,
-        TLPar _lPar_,
-        PExpression _expression_,
-        TRPar _rPar_)
+        TId _id_)
     {
-        setAscii(_ascii_);
-
-        setLPar(_lPar_);
-
-        setExpression(_expression_);
-
-        setRPar(_rPar_);
+        setId(_id_);
 
     }
     public Object clone()
     {
         return new AAsciiValExpression(
-            (TAscii) cloneNode(_ascii_),
-            (TLPar) cloneNode(_lPar_),
-            (PExpression) cloneNode(_expression_),
-            (TRPar) cloneNode(_rPar_));
+            (TId) cloneNode(_id_));
     }
 
     public void apply(Switch sw)
@@ -45,16 +30,16 @@ public final class AAsciiValExpression extends PExpression
         ((Analysis) sw).caseAAsciiValExpression(this);
     }
 
-    public TAscii getAscii()
+    public TId getId()
     {
-        return _ascii_;
+        return _id_;
     }
 
-    public void setAscii(TAscii node)
+    public void setId(TId node)
     {
-        if(_ascii_ != null)
+        if(_id_ != null)
         {
-            _ascii_.parent(null);
+            _id_.parent(null);
         }
 
         if(node != null)
@@ -67,116 +52,20 @@ public final class AAsciiValExpression extends PExpression
             node.parent(this);
         }
 
-        _ascii_ = node;
-    }
-
-    public TLPar getLPar()
-    {
-        return _lPar_;
-    }
-
-    public void setLPar(TLPar node)
-    {
-        if(_lPar_ != null)
-        {
-            _lPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lPar_ = node;
-    }
-
-    public PExpression getExpression()
-    {
-        return _expression_;
-    }
-
-    public void setExpression(PExpression node)
-    {
-        if(_expression_ != null)
-        {
-            _expression_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _expression_ = node;
-    }
-
-    public TRPar getRPar()
-    {
-        return _rPar_;
-    }
-
-    public void setRPar(TRPar node)
-    {
-        if(_rPar_ != null)
-        {
-            _rPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rPar_ = node;
+        _id_ = node;
     }
 
     public String toString()
     {
         return ""
-            + toString(_ascii_)
-            + toString(_lPar_)
-            + toString(_expression_)
-            + toString(_rPar_);
+            + toString(_id_);
     }
 
     void removeChild(Node child)
     {
-        if(_ascii_ == child)
+        if(_id_ == child)
         {
-            _ascii_ = null;
-            return;
-        }
-
-        if(_lPar_ == child)
-        {
-            _lPar_ = null;
-            return;
-        }
-
-        if(_expression_ == child)
-        {
-            _expression_ = null;
-            return;
-        }
-
-        if(_rPar_ == child)
-        {
-            _rPar_ = null;
+            _id_ = null;
             return;
         }
 
@@ -184,27 +73,9 @@ public final class AAsciiValExpression extends PExpression
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_ascii_ == oldChild)
+        if(_id_ == oldChild)
         {
-            setAscii((TAscii) newChild);
-            return;
-        }
-
-        if(_lPar_ == oldChild)
-        {
-            setLPar((TLPar) newChild);
-            return;
-        }
-
-        if(_expression_ == oldChild)
-        {
-            setExpression((PExpression) newChild);
-            return;
-        }
-
-        if(_rPar_ == oldChild)
-        {
-            setRPar((TRPar) newChild);
+            setId((TId) newChild);
             return;
         }
 

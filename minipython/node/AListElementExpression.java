@@ -8,9 +8,7 @@ import minipython.analysis.*;
 public final class AListElementExpression extends PExpression
 {
     private TId _id_;
-    private TLBra _lBra_;
     private PExpression _expression_;
-    private TRBra _rBra_;
 
     public AListElementExpression()
     {
@@ -18,26 +16,18 @@ public final class AListElementExpression extends PExpression
 
     public AListElementExpression(
         TId _id_,
-        TLBra _lBra_,
-        PExpression _expression_,
-        TRBra _rBra_)
+        PExpression _expression_)
     {
         setId(_id_);
 
-        setLBra(_lBra_);
-
         setExpression(_expression_);
-
-        setRBra(_rBra_);
 
     }
     public Object clone()
     {
         return new AListElementExpression(
             (TId) cloneNode(_id_),
-            (TLBra) cloneNode(_lBra_),
-            (PExpression) cloneNode(_expression_),
-            (TRBra) cloneNode(_rBra_));
+            (PExpression) cloneNode(_expression_));
     }
 
     public void apply(Switch sw)
@@ -70,31 +60,6 @@ public final class AListElementExpression extends PExpression
         _id_ = node;
     }
 
-    public TLBra getLBra()
-    {
-        return _lBra_;
-    }
-
-    public void setLBra(TLBra node)
-    {
-        if(_lBra_ != null)
-        {
-            _lBra_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lBra_ = node;
-    }
-
     public PExpression getExpression()
     {
         return _expression_;
@@ -120,38 +85,11 @@ public final class AListElementExpression extends PExpression
         _expression_ = node;
     }
 
-    public TRBra getRBra()
-    {
-        return _rBra_;
-    }
-
-    public void setRBra(TRBra node)
-    {
-        if(_rBra_ != null)
-        {
-            _rBra_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rBra_ = node;
-    }
-
     public String toString()
     {
         return ""
             + toString(_id_)
-            + toString(_lBra_)
-            + toString(_expression_)
-            + toString(_rBra_);
+            + toString(_expression_);
     }
 
     void removeChild(Node child)
@@ -162,21 +100,9 @@ public final class AListElementExpression extends PExpression
             return;
         }
 
-        if(_lBra_ == child)
-        {
-            _lBra_ = null;
-            return;
-        }
-
         if(_expression_ == child)
         {
             _expression_ = null;
-            return;
-        }
-
-        if(_rBra_ == child)
-        {
-            _rBra_ = null;
             return;
         }
 
@@ -190,21 +116,9 @@ public final class AListElementExpression extends PExpression
             return;
         }
 
-        if(_lBra_ == oldChild)
-        {
-            setLBra((TLBra) newChild);
-            return;
-        }
-
         if(_expression_ == oldChild)
         {
             setExpression((PExpression) newChild);
-            return;
-        }
-
-        if(_rBra_ == oldChild)
-        {
-            setRBra((TRBra) newChild);
             return;
         }
 

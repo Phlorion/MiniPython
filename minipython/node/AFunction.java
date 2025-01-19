@@ -7,12 +7,8 @@ import minipython.analysis.*;
 
 public final class AFunction extends PFunction
 {
-    private TDef _def_;
     private TId _id_;
-    private TLPar _lPar_;
-    private PArguements _arguements_;
-    private TRPar _rPar_;
-    private TSemi _semi_;
+    private final LinkedList _arguements_ = new TypedLinkedList(new Arguements_Cast());
     private PStatement _statement_;
 
     public AFunction()
@@ -20,25 +16,16 @@ public final class AFunction extends PFunction
     }
 
     public AFunction(
-        TDef _def_,
         TId _id_,
-        TLPar _lPar_,
-        PArguements _arguements_,
-        TRPar _rPar_,
-        TSemi _semi_,
+        List _arguements_,
         PStatement _statement_)
     {
-        setDef(_def_);
-
         setId(_id_);
 
-        setLPar(_lPar_);
-
-        setArguements(_arguements_);
-
-        setRPar(_rPar_);
-
-        setSemi(_semi_);
+        {
+            this._arguements_.clear();
+            this._arguements_.addAll(_arguements_);
+        }
 
         setStatement(_statement_);
 
@@ -46,43 +33,14 @@ public final class AFunction extends PFunction
     public Object clone()
     {
         return new AFunction(
-            (TDef) cloneNode(_def_),
             (TId) cloneNode(_id_),
-            (TLPar) cloneNode(_lPar_),
-            (PArguements) cloneNode(_arguements_),
-            (TRPar) cloneNode(_rPar_),
-            (TSemi) cloneNode(_semi_),
+            cloneList(_arguements_),
             (PStatement) cloneNode(_statement_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAFunction(this);
-    }
-
-    public TDef getDef()
-    {
-        return _def_;
-    }
-
-    public void setDef(TDef node)
-    {
-        if(_def_ != null)
-        {
-            _def_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _def_ = node;
     }
 
     public TId getId()
@@ -110,104 +68,15 @@ public final class AFunction extends PFunction
         _id_ = node;
     }
 
-    public TLPar getLPar()
-    {
-        return _lPar_;
-    }
-
-    public void setLPar(TLPar node)
-    {
-        if(_lPar_ != null)
-        {
-            _lPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lPar_ = node;
-    }
-
-    public PArguements getArguements()
+    public LinkedList getArguements()
     {
         return _arguements_;
     }
 
-    public void setArguements(PArguements node)
+    public void setArguements(List list)
     {
-        if(_arguements_ != null)
-        {
-            _arguements_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _arguements_ = node;
-    }
-
-    public TRPar getRPar()
-    {
-        return _rPar_;
-    }
-
-    public void setRPar(TRPar node)
-    {
-        if(_rPar_ != null)
-        {
-            _rPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rPar_ = node;
-    }
-
-    public TSemi getSemi()
-    {
-        return _semi_;
-    }
-
-    public void setSemi(TSemi node)
-    {
-        if(_semi_ != null)
-        {
-            _semi_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _semi_ = node;
+        _arguements_.clear();
+        _arguements_.addAll(list);
     }
 
     public PStatement getStatement()
@@ -238,50 +107,21 @@ public final class AFunction extends PFunction
     public String toString()
     {
         return ""
-            + toString(_def_)
             + toString(_id_)
-            + toString(_lPar_)
             + toString(_arguements_)
-            + toString(_rPar_)
-            + toString(_semi_)
             + toString(_statement_);
     }
 
     void removeChild(Node child)
     {
-        if(_def_ == child)
-        {
-            _def_ = null;
-            return;
-        }
-
         if(_id_ == child)
         {
             _id_ = null;
             return;
         }
 
-        if(_lPar_ == child)
+        if(_arguements_.remove(child))
         {
-            _lPar_ = null;
-            return;
-        }
-
-        if(_arguements_ == child)
-        {
-            _arguements_ = null;
-            return;
-        }
-
-        if(_rPar_ == child)
-        {
-            _rPar_ = null;
-            return;
-        }
-
-        if(_semi_ == child)
-        {
-            _semi_ = null;
             return;
         }
 
@@ -295,40 +135,27 @@ public final class AFunction extends PFunction
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_def_ == oldChild)
-        {
-            setDef((TDef) newChild);
-            return;
-        }
-
         if(_id_ == oldChild)
         {
             setId((TId) newChild);
             return;
         }
 
-        if(_lPar_ == oldChild)
+        for(ListIterator i = _arguements_.listIterator(); i.hasNext();)
         {
-            setLPar((TLPar) newChild);
-            return;
-        }
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set(newChild);
+                    oldChild.parent(null);
+                    return;
+                }
 
-        if(_arguements_ == oldChild)
-        {
-            setArguements((PArguements) newChild);
-            return;
-        }
-
-        if(_rPar_ == oldChild)
-        {
-            setRPar((TRPar) newChild);
-            return;
-        }
-
-        if(_semi_ == oldChild)
-        {
-            setSemi((TSemi) newChild);
-            return;
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
         if(_statement_ == oldChild)
@@ -337,5 +164,27 @@ public final class AFunction extends PFunction
             return;
         }
 
+    }
+
+    private class Arguements_Cast implements Cast
+    {
+        public Object cast(Object o)
+        {
+            PArguements node = (PArguements) o;
+
+            if((node.parent() != null) &&
+                (node.parent() != AFunction.this))
+            {
+                node.parent().removeChild(node);
+            }
+
+            if((node.parent() == null) ||
+                (node.parent() != AFunction.this))
+            {
+                node.parent(AFunction.this);
+            }
+
+            return node;
+        }
     }
 }

@@ -8,9 +8,7 @@ import minipython.analysis.*;
 public final class AFunctionCall extends PFunctionCall
 {
     private TId _id_;
-    private TLPar _lPar_;
-    private PArglist _arglist_;
-    private TRPar _rPar_;
+    private final LinkedList _arglist_ = new TypedLinkedList(new Arglist_Cast());
 
     public AFunctionCall()
     {
@@ -18,26 +16,21 @@ public final class AFunctionCall extends PFunctionCall
 
     public AFunctionCall(
         TId _id_,
-        TLPar _lPar_,
-        PArglist _arglist_,
-        TRPar _rPar_)
+        List _arglist_)
     {
         setId(_id_);
 
-        setLPar(_lPar_);
-
-        setArglist(_arglist_);
-
-        setRPar(_rPar_);
+        {
+            this._arglist_.clear();
+            this._arglist_.addAll(_arglist_);
+        }
 
     }
     public Object clone()
     {
         return new AFunctionCall(
             (TId) cloneNode(_id_),
-            (TLPar) cloneNode(_lPar_),
-            (PArglist) cloneNode(_arglist_),
-            (TRPar) cloneNode(_rPar_));
+            cloneList(_arglist_));
     }
 
     public void apply(Switch sw)
@@ -70,88 +63,22 @@ public final class AFunctionCall extends PFunctionCall
         _id_ = node;
     }
 
-    public TLPar getLPar()
-    {
-        return _lPar_;
-    }
-
-    public void setLPar(TLPar node)
-    {
-        if(_lPar_ != null)
-        {
-            _lPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lPar_ = node;
-    }
-
-    public PArglist getArglist()
+    public LinkedList getArglist()
     {
         return _arglist_;
     }
 
-    public void setArglist(PArglist node)
+    public void setArglist(List list)
     {
-        if(_arglist_ != null)
-        {
-            _arglist_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _arglist_ = node;
-    }
-
-    public TRPar getRPar()
-    {
-        return _rPar_;
-    }
-
-    public void setRPar(TRPar node)
-    {
-        if(_rPar_ != null)
-        {
-            _rPar_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rPar_ = node;
+        _arglist_.clear();
+        _arglist_.addAll(list);
     }
 
     public String toString()
     {
         return ""
             + toString(_id_)
-            + toString(_lPar_)
-            + toString(_arglist_)
-            + toString(_rPar_);
+            + toString(_arglist_);
     }
 
     void removeChild(Node child)
@@ -162,21 +89,8 @@ public final class AFunctionCall extends PFunctionCall
             return;
         }
 
-        if(_lPar_ == child)
+        if(_arglist_.remove(child))
         {
-            _lPar_ = null;
-            return;
-        }
-
-        if(_arglist_ == child)
-        {
-            _arglist_ = null;
-            return;
-        }
-
-        if(_rPar_ == child)
-        {
-            _rPar_ = null;
             return;
         }
 
@@ -190,23 +104,44 @@ public final class AFunctionCall extends PFunctionCall
             return;
         }
 
-        if(_lPar_ == oldChild)
+        for(ListIterator i = _arglist_.listIterator(); i.hasNext();)
         {
-            setLPar((TLPar) newChild);
-            return;
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set(newChild);
+                    oldChild.parent(null);
+                    return;
+                }
+
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
-        if(_arglist_ == oldChild)
-        {
-            setArglist((PArglist) newChild);
-            return;
-        }
+    }
 
-        if(_rPar_ == oldChild)
+    private class Arglist_Cast implements Cast
+    {
+        public Object cast(Object o)
         {
-            setRPar((TRPar) newChild);
-            return;
-        }
+            PArglist node = (PArglist) o;
 
+            if((node.parent() != null) &&
+                (node.parent() != AFunctionCall.this))
+            {
+                node.parent().removeChild(node);
+            }
+
+            if((node.parent() == null) ||
+                (node.parent() != AFunctionCall.this))
+            {
+                node.parent(AFunctionCall.this);
+            }
+
+            return node;
+        }
     }
 }

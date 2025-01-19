@@ -7,12 +7,8 @@ import minipython.analysis.*;
 
 public final class AArrayAssignStatement extends PStatement
 {
-    private final LinkedList _tab_ = new TypedLinkedList(new Tab_Cast());
     private TId _id_;
-    private TLBra _lBra_;
     private PExpression _index_;
-    private TRBra _rBra_;
-    private TEq _eq_;
     private PExpression _rightSide_;
 
     public AArrayAssignStatement()
@@ -20,28 +16,13 @@ public final class AArrayAssignStatement extends PStatement
     }
 
     public AArrayAssignStatement(
-        List _tab_,
         TId _id_,
-        TLBra _lBra_,
         PExpression _index_,
-        TRBra _rBra_,
-        TEq _eq_,
         PExpression _rightSide_)
     {
-        {
-            this._tab_.clear();
-            this._tab_.addAll(_tab_);
-        }
-
         setId(_id_);
 
-        setLBra(_lBra_);
-
         setIndex(_index_);
-
-        setRBra(_rBra_);
-
-        setEq(_eq_);
 
         setRightSide(_rightSide_);
 
@@ -49,29 +30,14 @@ public final class AArrayAssignStatement extends PStatement
     public Object clone()
     {
         return new AArrayAssignStatement(
-            cloneList(_tab_),
             (TId) cloneNode(_id_),
-            (TLBra) cloneNode(_lBra_),
             (PExpression) cloneNode(_index_),
-            (TRBra) cloneNode(_rBra_),
-            (TEq) cloneNode(_eq_),
             (PExpression) cloneNode(_rightSide_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAArrayAssignStatement(this);
-    }
-
-    public LinkedList getTab()
-    {
-        return _tab_;
-    }
-
-    public void setTab(List list)
-    {
-        _tab_.clear();
-        _tab_.addAll(list);
     }
 
     public TId getId()
@@ -99,31 +65,6 @@ public final class AArrayAssignStatement extends PStatement
         _id_ = node;
     }
 
-    public TLBra getLBra()
-    {
-        return _lBra_;
-    }
-
-    public void setLBra(TLBra node)
-    {
-        if(_lBra_ != null)
-        {
-            _lBra_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _lBra_ = node;
-    }
-
     public PExpression getIndex()
     {
         return _index_;
@@ -147,56 +88,6 @@ public final class AArrayAssignStatement extends PStatement
         }
 
         _index_ = node;
-    }
-
-    public TRBra getRBra()
-    {
-        return _rBra_;
-    }
-
-    public void setRBra(TRBra node)
-    {
-        if(_rBra_ != null)
-        {
-            _rBra_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rBra_ = node;
-    }
-
-    public TEq getEq()
-    {
-        return _eq_;
-    }
-
-    public void setEq(TEq node)
-    {
-        if(_eq_ != null)
-        {
-            _eq_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _eq_ = node;
     }
 
     public PExpression getRightSide()
@@ -227,49 +118,22 @@ public final class AArrayAssignStatement extends PStatement
     public String toString()
     {
         return ""
-            + toString(_tab_)
             + toString(_id_)
-            + toString(_lBra_)
             + toString(_index_)
-            + toString(_rBra_)
-            + toString(_eq_)
             + toString(_rightSide_);
     }
 
     void removeChild(Node child)
     {
-        if(_tab_.remove(child))
-        {
-            return;
-        }
-
         if(_id_ == child)
         {
             _id_ = null;
             return;
         }
 
-        if(_lBra_ == child)
-        {
-            _lBra_ = null;
-            return;
-        }
-
         if(_index_ == child)
         {
             _index_ = null;
-            return;
-        }
-
-        if(_rBra_ == child)
-        {
-            _rBra_ = null;
-            return;
-        }
-
-        if(_eq_ == child)
-        {
-            _eq_ = null;
             return;
         }
 
@@ -283,32 +147,9 @@ public final class AArrayAssignStatement extends PStatement
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        for(ListIterator i = _tab_.listIterator(); i.hasNext();)
-        {
-            if(i.next() == oldChild)
-            {
-                if(newChild != null)
-                {
-                    i.set(newChild);
-                    oldChild.parent(null);
-                    return;
-                }
-
-                i.remove();
-                oldChild.parent(null);
-                return;
-            }
-        }
-
         if(_id_ == oldChild)
         {
             setId((TId) newChild);
-            return;
-        }
-
-        if(_lBra_ == oldChild)
-        {
-            setLBra((TLBra) newChild);
             return;
         }
 
@@ -318,45 +159,11 @@ public final class AArrayAssignStatement extends PStatement
             return;
         }
 
-        if(_rBra_ == oldChild)
-        {
-            setRBra((TRBra) newChild);
-            return;
-        }
-
-        if(_eq_ == oldChild)
-        {
-            setEq((TEq) newChild);
-            return;
-        }
-
         if(_rightSide_ == oldChild)
         {
             setRightSide((PExpression) newChild);
             return;
         }
 
-    }
-
-    private class Tab_Cast implements Cast
-    {
-        public Object cast(Object o)
-        {
-            TTab node = (TTab) o;
-
-            if((node.parent() != null) &&
-                (node.parent() != AArrayAssignStatement.this))
-            {
-                node.parent().removeChild(node);
-            }
-
-            if((node.parent() == null) ||
-                (node.parent() != AArrayAssignStatement.this))
-            {
-                node.parent(AArrayAssignStatement.this);
-            }
-
-            return node;
-        }
     }
 }

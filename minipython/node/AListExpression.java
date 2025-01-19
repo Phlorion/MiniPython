@@ -7,40 +7,30 @@ import minipython.analysis.*;
 
 public final class AListExpression extends PExpression
 {
-    private TLBra _lBra_;
-    private PValue _value_;
-    private final LinkedList _multipleValues_ = new TypedLinkedList(new MultipleValues_Cast());
-    private TRBra _rBra_;
+    private PValue _lvalue_;
+    private final LinkedList _multVals_ = new TypedLinkedList(new MultVals_Cast());
 
     public AListExpression()
     {
     }
 
     public AListExpression(
-        TLBra _lBra_,
-        PValue _value_,
-        List _multipleValues_,
-        TRBra _rBra_)
+        PValue _lvalue_,
+        List _multVals_)
     {
-        setLBra(_lBra_);
-
-        setValue(_value_);
+        setLvalue(_lvalue_);
 
         {
-            this._multipleValues_.clear();
-            this._multipleValues_.addAll(_multipleValues_);
+            this._multVals_.clear();
+            this._multVals_.addAll(_multVals_);
         }
-
-        setRBra(_rBra_);
 
     }
     public Object clone()
     {
         return new AListExpression(
-            (TLBra) cloneNode(_lBra_),
-            (PValue) cloneNode(_value_),
-            cloneList(_multipleValues_),
-            (TRBra) cloneNode(_rBra_));
+            (PValue) cloneNode(_lvalue_),
+            cloneList(_multVals_));
     }
 
     public void apply(Switch sw)
@@ -48,16 +38,16 @@ public final class AListExpression extends PExpression
         ((Analysis) sw).caseAListExpression(this);
     }
 
-    public TLBra getLBra()
+    public PValue getLvalue()
     {
-        return _lBra_;
+        return _lvalue_;
     }
 
-    public void setLBra(TLBra node)
+    public void setLvalue(PValue node)
     {
-        if(_lBra_ != null)
+        if(_lvalue_ != null)
         {
-            _lBra_.parent(null);
+            _lvalue_.parent(null);
         }
 
         if(node != null)
@@ -70,101 +60,37 @@ public final class AListExpression extends PExpression
             node.parent(this);
         }
 
-        _lBra_ = node;
+        _lvalue_ = node;
     }
 
-    public PValue getValue()
+    public LinkedList getMultVals()
     {
-        return _value_;
+        return _multVals_;
     }
 
-    public void setValue(PValue node)
+    public void setMultVals(List list)
     {
-        if(_value_ != null)
-        {
-            _value_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _value_ = node;
-    }
-
-    public LinkedList getMultipleValues()
-    {
-        return _multipleValues_;
-    }
-
-    public void setMultipleValues(List list)
-    {
-        _multipleValues_.clear();
-        _multipleValues_.addAll(list);
-    }
-
-    public TRBra getRBra()
-    {
-        return _rBra_;
-    }
-
-    public void setRBra(TRBra node)
-    {
-        if(_rBra_ != null)
-        {
-            _rBra_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _rBra_ = node;
+        _multVals_.clear();
+        _multVals_.addAll(list);
     }
 
     public String toString()
     {
         return ""
-            + toString(_lBra_)
-            + toString(_value_)
-            + toString(_multipleValues_)
-            + toString(_rBra_);
+            + toString(_lvalue_)
+            + toString(_multVals_);
     }
 
     void removeChild(Node child)
     {
-        if(_lBra_ == child)
+        if(_lvalue_ == child)
         {
-            _lBra_ = null;
+            _lvalue_ = null;
             return;
         }
 
-        if(_value_ == child)
+        if(_multVals_.remove(child))
         {
-            _value_ = null;
-            return;
-        }
-
-        if(_multipleValues_.remove(child))
-        {
-            return;
-        }
-
-        if(_rBra_ == child)
-        {
-            _rBra_ = null;
             return;
         }
 
@@ -172,19 +98,13 @@ public final class AListExpression extends PExpression
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_lBra_ == oldChild)
+        if(_lvalue_ == oldChild)
         {
-            setLBra((TLBra) newChild);
+            setLvalue((PValue) newChild);
             return;
         }
 
-        if(_value_ == oldChild)
-        {
-            setValue((PValue) newChild);
-            return;
-        }
-
-        for(ListIterator i = _multipleValues_.listIterator(); i.hasNext();)
+        for(ListIterator i = _multVals_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
@@ -201,19 +121,13 @@ public final class AListExpression extends PExpression
             }
         }
 
-        if(_rBra_ == oldChild)
-        {
-            setRBra((TRBra) newChild);
-            return;
-        }
-
     }
 
-    private class MultipleValues_Cast implements Cast
+    private class MultVals_Cast implements Cast
     {
         public Object cast(Object o)
         {
-            PMultipleValues node = (PMultipleValues) o;
+            PValue node = (PValue) o;
 
             if((node.parent() != null) &&
                 (node.parent() != AListExpression.this))

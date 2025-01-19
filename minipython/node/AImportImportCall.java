@@ -7,9 +7,8 @@ import minipython.analysis.*;
 
 public final class AImportImportCall extends PImportCall
 {
-    private TImport _import_;
     private PModule _module_;
-    private PAsIdent _asIdent_;
+    private final LinkedList _asIdent_ = new TypedLinkedList(new AsIdent_Cast());
     private final LinkedList _cmodAsIdent_ = new TypedLinkedList(new CmodAsIdent_Cast());
 
     public AImportImportCall()
@@ -17,16 +16,16 @@ public final class AImportImportCall extends PImportCall
     }
 
     public AImportImportCall(
-        TImport _import_,
         PModule _module_,
-        PAsIdent _asIdent_,
+        List _asIdent_,
         List _cmodAsIdent_)
     {
-        setImport(_import_);
-
         setModule(_module_);
 
-        setAsIdent(_asIdent_);
+        {
+            this._asIdent_.clear();
+            this._asIdent_.addAll(_asIdent_);
+        }
 
         {
             this._cmodAsIdent_.clear();
@@ -37,40 +36,14 @@ public final class AImportImportCall extends PImportCall
     public Object clone()
     {
         return new AImportImportCall(
-            (TImport) cloneNode(_import_),
             (PModule) cloneNode(_module_),
-            (PAsIdent) cloneNode(_asIdent_),
+            cloneList(_asIdent_),
             cloneList(_cmodAsIdent_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAImportImportCall(this);
-    }
-
-    public TImport getImport()
-    {
-        return _import_;
-    }
-
-    public void setImport(TImport node)
-    {
-        if(_import_ != null)
-        {
-            _import_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _import_ = node;
     }
 
     public PModule getModule()
@@ -98,29 +71,15 @@ public final class AImportImportCall extends PImportCall
         _module_ = node;
     }
 
-    public PAsIdent getAsIdent()
+    public LinkedList getAsIdent()
     {
         return _asIdent_;
     }
 
-    public void setAsIdent(PAsIdent node)
+    public void setAsIdent(List list)
     {
-        if(_asIdent_ != null)
-        {
-            _asIdent_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _asIdent_ = node;
+        _asIdent_.clear();
+        _asIdent_.addAll(list);
     }
 
     public LinkedList getCmodAsIdent()
@@ -137,7 +96,6 @@ public final class AImportImportCall extends PImportCall
     public String toString()
     {
         return ""
-            + toString(_import_)
             + toString(_module_)
             + toString(_asIdent_)
             + toString(_cmodAsIdent_);
@@ -145,21 +103,14 @@ public final class AImportImportCall extends PImportCall
 
     void removeChild(Node child)
     {
-        if(_import_ == child)
-        {
-            _import_ = null;
-            return;
-        }
-
         if(_module_ == child)
         {
             _module_ = null;
             return;
         }
 
-        if(_asIdent_ == child)
+        if(_asIdent_.remove(child))
         {
-            _asIdent_ = null;
             return;
         }
 
@@ -172,22 +123,27 @@ public final class AImportImportCall extends PImportCall
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        if(_import_ == oldChild)
-        {
-            setImport((TImport) newChild);
-            return;
-        }
-
         if(_module_ == oldChild)
         {
             setModule((PModule) newChild);
             return;
         }
 
-        if(_asIdent_ == oldChild)
+        for(ListIterator i = _asIdent_.listIterator(); i.hasNext();)
         {
-            setAsIdent((PAsIdent) newChild);
-            return;
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set(newChild);
+                    oldChild.parent(null);
+                    return;
+                }
+
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
         for(ListIterator i = _cmodAsIdent_.listIterator(); i.hasNext();)
@@ -207,6 +163,28 @@ public final class AImportImportCall extends PImportCall
             }
         }
 
+    }
+
+    private class AsIdent_Cast implements Cast
+    {
+        public Object cast(Object o)
+        {
+            PAsIdent node = (PAsIdent) o;
+
+            if((node.parent() != null) &&
+                (node.parent() != AImportImportCall.this))
+            {
+                node.parent().removeChild(node);
+            }
+
+            if((node.parent() == null) ||
+                (node.parent() != AImportImportCall.this))
+            {
+                node.parent(AImportImportCall.this);
+            }
+
+            return node;
+        }
     }
 
     private class CmodAsIdent_Cast implements Cast

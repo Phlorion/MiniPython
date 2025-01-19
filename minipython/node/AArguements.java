@@ -8,7 +8,7 @@ import minipython.analysis.*;
 public final class AArguements extends PArguements
 {
     private TId _id_;
-    private PAssignval _assignval_;
+    private final LinkedList _value_ = new TypedLinkedList(new Value_Cast());
     private final LinkedList _multipleargs_ = new TypedLinkedList(new Multipleargs_Cast());
 
     public AArguements()
@@ -17,12 +17,15 @@ public final class AArguements extends PArguements
 
     public AArguements(
         TId _id_,
-        PAssignval _assignval_,
+        List _value_,
         List _multipleargs_)
     {
         setId(_id_);
 
-        setAssignval(_assignval_);
+        {
+            this._value_.clear();
+            this._value_.addAll(_value_);
+        }
 
         {
             this._multipleargs_.clear();
@@ -34,7 +37,7 @@ public final class AArguements extends PArguements
     {
         return new AArguements(
             (TId) cloneNode(_id_),
-            (PAssignval) cloneNode(_assignval_),
+            cloneList(_value_),
             cloneList(_multipleargs_));
     }
 
@@ -68,29 +71,15 @@ public final class AArguements extends PArguements
         _id_ = node;
     }
 
-    public PAssignval getAssignval()
+    public LinkedList getValue()
     {
-        return _assignval_;
+        return _value_;
     }
 
-    public void setAssignval(PAssignval node)
+    public void setValue(List list)
     {
-        if(_assignval_ != null)
-        {
-            _assignval_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _assignval_ = node;
+        _value_.clear();
+        _value_.addAll(list);
     }
 
     public LinkedList getMultipleargs()
@@ -108,7 +97,7 @@ public final class AArguements extends PArguements
     {
         return ""
             + toString(_id_)
-            + toString(_assignval_)
+            + toString(_value_)
             + toString(_multipleargs_);
     }
 
@@ -120,9 +109,8 @@ public final class AArguements extends PArguements
             return;
         }
 
-        if(_assignval_ == child)
+        if(_value_.remove(child))
         {
-            _assignval_ = null;
             return;
         }
 
@@ -141,10 +129,21 @@ public final class AArguements extends PArguements
             return;
         }
 
-        if(_assignval_ == oldChild)
+        for(ListIterator i = _value_.listIterator(); i.hasNext();)
         {
-            setAssignval((PAssignval) newChild);
-            return;
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set(newChild);
+                    oldChild.parent(null);
+                    return;
+                }
+
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
         for(ListIterator i = _multipleargs_.listIterator(); i.hasNext();)
@@ -164,6 +163,28 @@ public final class AArguements extends PArguements
             }
         }
 
+    }
+
+    private class Value_Cast implements Cast
+    {
+        public Object cast(Object o)
+        {
+            PValue node = (PValue) o;
+
+            if((node.parent() != null) &&
+                (node.parent() != AArguements.this))
+            {
+                node.parent().removeChild(node);
+            }
+
+            if((node.parent() == null) ||
+                (node.parent() != AArguements.this))
+            {
+                node.parent(AArguements.this);
+            }
+
+            return node;
+        }
     }
 
     private class Multipleargs_Cast implements Cast

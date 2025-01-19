@@ -7,10 +7,7 @@ import minipython.analysis.*;
 
 public final class AIfStatement extends PStatement
 {
-    private final LinkedList _tab_ = new TypedLinkedList(new Tab_Cast());
-    private TIf _if_;
-    private PComparison _comparison_;
-    private TSemi _semi_;
+    private PComparisons _comparisons_;
     private PStatement _statement_;
 
     public AIfStatement()
@@ -18,22 +15,10 @@ public final class AIfStatement extends PStatement
     }
 
     public AIfStatement(
-        List _tab_,
-        TIf _if_,
-        PComparison _comparison_,
-        TSemi _semi_,
+        PComparisons _comparisons_,
         PStatement _statement_)
     {
-        {
-            this._tab_.clear();
-            this._tab_.addAll(_tab_);
-        }
-
-        setIf(_if_);
-
-        setComparison(_comparison_);
-
-        setSemi(_semi_);
+        setComparisons(_comparisons_);
 
         setStatement(_statement_);
 
@@ -41,10 +26,7 @@ public final class AIfStatement extends PStatement
     public Object clone()
     {
         return new AIfStatement(
-            cloneList(_tab_),
-            (TIf) cloneNode(_if_),
-            (PComparison) cloneNode(_comparison_),
-            (TSemi) cloneNode(_semi_),
+            (PComparisons) cloneNode(_comparisons_),
             (PStatement) cloneNode(_statement_));
     }
 
@@ -53,27 +35,16 @@ public final class AIfStatement extends PStatement
         ((Analysis) sw).caseAIfStatement(this);
     }
 
-    public LinkedList getTab()
+    public PComparisons getComparisons()
     {
-        return _tab_;
+        return _comparisons_;
     }
 
-    public void setTab(List list)
+    public void setComparisons(PComparisons node)
     {
-        _tab_.clear();
-        _tab_.addAll(list);
-    }
-
-    public TIf getIf()
-    {
-        return _if_;
-    }
-
-    public void setIf(TIf node)
-    {
-        if(_if_ != null)
+        if(_comparisons_ != null)
         {
-            _if_.parent(null);
+            _comparisons_.parent(null);
         }
 
         if(node != null)
@@ -86,57 +57,7 @@ public final class AIfStatement extends PStatement
             node.parent(this);
         }
 
-        _if_ = node;
-    }
-
-    public PComparison getComparison()
-    {
-        return _comparison_;
-    }
-
-    public void setComparison(PComparison node)
-    {
-        if(_comparison_ != null)
-        {
-            _comparison_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _comparison_ = node;
-    }
-
-    public TSemi getSemi()
-    {
-        return _semi_;
-    }
-
-    public void setSemi(TSemi node)
-    {
-        if(_semi_ != null)
-        {
-            _semi_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        _semi_ = node;
+        _comparisons_ = node;
     }
 
     public PStatement getStatement()
@@ -167,35 +88,15 @@ public final class AIfStatement extends PStatement
     public String toString()
     {
         return ""
-            + toString(_tab_)
-            + toString(_if_)
-            + toString(_comparison_)
-            + toString(_semi_)
+            + toString(_comparisons_)
             + toString(_statement_);
     }
 
     void removeChild(Node child)
     {
-        if(_tab_.remove(child))
+        if(_comparisons_ == child)
         {
-            return;
-        }
-
-        if(_if_ == child)
-        {
-            _if_ = null;
-            return;
-        }
-
-        if(_comparison_ == child)
-        {
-            _comparison_ = null;
-            return;
-        }
-
-        if(_semi_ == child)
-        {
-            _semi_ = null;
+            _comparisons_ = null;
             return;
         }
 
@@ -209,38 +110,9 @@ public final class AIfStatement extends PStatement
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        for(ListIterator i = _tab_.listIterator(); i.hasNext();)
+        if(_comparisons_ == oldChild)
         {
-            if(i.next() == oldChild)
-            {
-                if(newChild != null)
-                {
-                    i.set(newChild);
-                    oldChild.parent(null);
-                    return;
-                }
-
-                i.remove();
-                oldChild.parent(null);
-                return;
-            }
-        }
-
-        if(_if_ == oldChild)
-        {
-            setIf((TIf) newChild);
-            return;
-        }
-
-        if(_comparison_ == oldChild)
-        {
-            setComparison((PComparison) newChild);
-            return;
-        }
-
-        if(_semi_ == oldChild)
-        {
-            setSemi((TSemi) newChild);
+            setComparisons((PComparisons) newChild);
             return;
         }
 
@@ -250,27 +122,5 @@ public final class AIfStatement extends PStatement
             return;
         }
 
-    }
-
-    private class Tab_Cast implements Cast
-    {
-        public Object cast(Object o)
-        {
-            TTab node = (TTab) o;
-
-            if((node.parent() != null) &&
-                (node.parent() != AIfStatement.this))
-            {
-                node.parent().removeChild(node);
-            }
-
-            if((node.parent() == null) ||
-                (node.parent() != AIfStatement.this))
-            {
-                node.parent(AIfStatement.this);
-            }
-
-            return node;
-        }
     }
 }

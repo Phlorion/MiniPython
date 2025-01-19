@@ -7,7 +7,6 @@ import minipython.analysis.*;
 
 public final class AImportStatement extends PStatement
 {
-    private final LinkedList _tab_ = new TypedLinkedList(new Tab_Cast());
     private PImportCall _importCall_;
 
     public AImportStatement()
@@ -15,38 +14,20 @@ public final class AImportStatement extends PStatement
     }
 
     public AImportStatement(
-        List _tab_,
         PImportCall _importCall_)
     {
-        {
-            this._tab_.clear();
-            this._tab_.addAll(_tab_);
-        }
-
         setImportCall(_importCall_);
 
     }
     public Object clone()
     {
         return new AImportStatement(
-            cloneList(_tab_),
             (PImportCall) cloneNode(_importCall_));
     }
 
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAImportStatement(this);
-    }
-
-    public LinkedList getTab()
-    {
-        return _tab_;
-    }
-
-    public void setTab(List list)
-    {
-        _tab_.clear();
-        _tab_.addAll(list);
     }
 
     public PImportCall getImportCall()
@@ -77,17 +58,11 @@ public final class AImportStatement extends PStatement
     public String toString()
     {
         return ""
-            + toString(_tab_)
             + toString(_importCall_);
     }
 
     void removeChild(Node child)
     {
-        if(_tab_.remove(child))
-        {
-            return;
-        }
-
         if(_importCall_ == child)
         {
             _importCall_ = null;
@@ -98,50 +73,11 @@ public final class AImportStatement extends PStatement
 
     void replaceChild(Node oldChild, Node newChild)
     {
-        for(ListIterator i = _tab_.listIterator(); i.hasNext();)
-        {
-            if(i.next() == oldChild)
-            {
-                if(newChild != null)
-                {
-                    i.set(newChild);
-                    oldChild.parent(null);
-                    return;
-                }
-
-                i.remove();
-                oldChild.parent(null);
-                return;
-            }
-        }
-
         if(_importCall_ == oldChild)
         {
             setImportCall((PImportCall) newChild);
             return;
         }
 
-    }
-
-    private class Tab_Cast implements Cast
-    {
-        public Object cast(Object o)
-        {
-            TTab node = (TTab) o;
-
-            if((node.parent() != null) &&
-                (node.parent() != AImportStatement.this))
-            {
-                node.parent().removeChild(node);
-            }
-
-            if((node.parent() == null) ||
-                (node.parent() != AImportStatement.this))
-            {
-                node.parent(AImportStatement.this);
-            }
-
-            return node;
-        }
     }
 }
